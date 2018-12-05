@@ -4,13 +4,12 @@
 
 **THIS DOCUMENT IS A WORK IN PROGRESS**
 
-Errors have always been a problem in development of ours servers in Go. This
-package aims to address the main problems, centralizing a solution.
+Errors have always been a problem in rthe development of our servers in Go. This package aims to address the main problems, centralizing a solution.
 
 ## Scenario
 
 Let's start by creating our scenario: The user Astrobervaldo already signed in
-system S. Astrobervaldo tries to create a new TODO item which fails because an
+system S. Astrobervaldo tries to create a new TODO item which fails because of an
 invalid JSON was sent as input.
 
 ### API
@@ -36,20 +35,20 @@ Consider the following code:
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
-	return errors.WrapHttp(err, 400) // BadRequest
+    return errors.WrapHttp(err, 400) // BadRequest
 }
 ```
 
 The code above shows an error being wrapped as an HttpError. Upwards, it can
 be checked and the status code, inside of it, can be applied to a possible 
-http response structure.
+HTTP response structure.
 
 To improve the usage, a `Wrap` function was created:
 
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
-	return errors.Wrap(err, Http(400)) // BadRequest
+    return errors.Wrap(err, Http(400)) // BadRequest
 }
 ```
 
@@ -60,22 +59,22 @@ and make multiple wraps:
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
-	return errors.Wrap(err, Http(400), Code("invalid-json")) // BadRequest
+    return errors.Wrap(err, Http(400), Code("invalid-json")) // BadRequest
 }
 ```
 
 In this example, `err` was wrapped twice. With a `HttpError` and a
 `ReportableError`. In other words, the error returned is a `ReportableError`
-with a HttpError as reason, this `HttpError` has the original err as `Reason`.
+with a `HttpError` as `Reason`, this `HttpError` has the original err as `Reason`.
 
-### How does the pieces of info get together?
+### How do the pieces of info get together?
 
-For that, an interface `type ErrorResponse interface` was  implemented.
+For that, an interface `type ErrorResponse interface` was implemented.
 
-A `ErrorResponse` aggregates all extra information about an error. The idea is
-that a `ErrorResponse` will be serialized and sent whom is using the system.
+An `ErrorResponse` aggregates all extra information about an error. The idea is
+that an `ErrorResponse` will be serialized and sent whom is using the system.
 
-### How the aggregation occurs?
+### How aggregation occurs?
 
 Some errors, those that need to add information to the `ErrorResponse`, implement
 another interface `ErrorResponseAggregator`. This interface has a
@@ -84,25 +83,25 @@ another interface `ErrorResponseAggregator`. This interface has a
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
-	return errors.WrapHttp(err, 400) // BadRequest
+    return errors.WrapHttp(err, 400) // BadRequest
 }
 ```
 
 Here, the returned error would have its `AppendData` method called, and only
-this one because its `Reason` is not a `ErrorResponseAggregator` (it is the
+this one because its `Reason` is not an `ErrorResponseAggregator` (it is the
 original unmarshaling error).
 
 
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
-	return errors.Wrap(err, Http(400), Code("invalid-json")) // BadRequest
+    return errors.Wrap(err, Http(400), Code("invalid-json")) // BadRequest
 }
 ```
 
-In this case, a `ReportableError` would be have its `AppendData` called, a
+In this case, a `ReportableError` would have its `AppendData` called, a
 `HttpError` would have its `AppendData` called afterwards, and then the original
-unmarshaling error would be reached and nothing more would happen.
+the unmarshaling error would be reached and nothing more would happen.
 
 
 ### Error Types
