@@ -42,7 +42,7 @@ var _ = Describe("Wrap", func() {
 	It("should wrap with a ReportableError", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Code("123"))
-		reportableErr, ok := err.(lerrors.ReportableError)
+		reportableErr, ok := err.(lerrors.ErrorWithCode)
 		Expect(ok).To(BeTrue())
 		Expect(reportableErr.Code()).To(Equal("123"))
 	})

@@ -122,7 +122,7 @@ area of the system the error is emerging from.
 **Wrap**: `Module(module string)`: It returns a default `ModuleError` implementation
 which is also a `ErrorResponseAggregator`.
 
-**ReportableError**
+**ErrorWithCode**
 
 This error means something special, it marks the error can be reported to the
 final client. Otherwise, the idea is that an unknown error blows to the actor

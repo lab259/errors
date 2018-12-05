@@ -7,14 +7,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-var _ = Describe("ReportableError", func() {
+var _ = Describe("ErrorWithCode", func() {
 	It("should wrap a ReportableError", func() {
 		nerr := errors.New("test")
-		err := lerrors.NewReportable(nerr, "error code")
+		err := lerrors.WrapCode(nerr, "error code")
 		Expect(err).NotTo(BeNil())
 		Expect(err.Error()).To(Equal("error code"))
 
-		reportableErr, ok := err.(lerrors.ReportableError)
+		reportableErr, ok := err.(lerrors.ErrorWithCode)
 		Expect(ok).To(BeTrue())
 		Expect(reportableErr.Code()).To(Equal("error code"))
 

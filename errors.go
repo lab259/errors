@@ -16,7 +16,7 @@ func Module(module string) Option {
 
 func Code(code string) Option {
 	return func(reason error) error {
-		return NewReportable(reason, code)
+		return WrapCode(reason, code)
 	}
 }
 
