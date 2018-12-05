@@ -39,7 +39,7 @@ var _ = Describe("Wrap", func() {
 		Expect(httpErr.StatusCode()).To(Equal(123))
 	})
 
-	It("should wrap with a ReportableError", func() {
+	It("should wrap with a ErrorWithCode", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Code("123"))
 		reportableErr, ok := err.(lerrors.ErrorWithCode)
@@ -47,7 +47,15 @@ var _ = Describe("Wrap", func() {
 		Expect(reportableErr.Code()).To(Equal("123"))
 	})
 
-	It("should wrap with a ReportableError", func() {
+	It("should wrap with a ErrorWithMessage", func() {
+		nerr := errors.New("error")
+		err := lerrors.Wrap(nerr, lerrors.Message("123"))
+		reportableErr, ok := err.(lerrors.ErrorWithMessage)
+		Expect(ok).To(BeTrue())
+		Expect(reportableErr.Message()).To(Equal("123"))
+	})
+
+	It("should wrap with a ModuleError", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Module("123"))
 		moduleErr, ok := err.(lerrors.ModuleError)

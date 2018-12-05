@@ -26,6 +26,12 @@ func Validation() Option {
 	}
 }
 
+func Message(message string) Option {
+	return func(err error) error {
+		return WrapMessage(err, message)
+	}
+}
+
 func Wrap(reason error, options ...Option) error {
 	err := reason
 	for _, opt := range options {
