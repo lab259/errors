@@ -11,3 +11,30 @@ type ErrorResponse interface {
 type ErrorResponseAggregator interface {
 	AppendData(response ErrorResponse)
 }
+
+// AggregateToResponse add the error information pieces to the errResponse. Then,
+// it tries to check its `Reason` (if the error is an `ErrorWithReason`) for more
+// data. It goes upward until `Reason` is not found.
+//
+// If at least one `ErrorResponseAggregator` is found it returns true, otherwise
+// it returns false.
+func AggregateToResponse(data interface{}, errResponse ErrorResponse) bool {
+	if err, ok := data.(error); ok {
+		handled := false
+		for err != nil {
+			if e, ok := err.(ErrorResponseAggregator); ok {
+				e.AppendData(errResponse)
+				handled = true
+			}
+			if e, ok := err.(ErrorWithReason); ok {
+				err = e.Reason()
+				continue
+			}
+			break
+		}
+		if handled {
+			return true
+		}
+	}
+	return false
+}
