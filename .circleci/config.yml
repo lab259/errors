@@ -1,0 +1,29 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.10.3
+
+    working_directory: /go/src/github.com/lab259/errors
+    steps:
+      - checkout
+
+      - run:
+          name: Setup .netrc
+          command: |
+            echo "machine github.com" > $HOME/.netrc
+            echo "    login $GITHUB_USERNAME" >> $HOME/.netrc
+            echo "    password $GITHUB_TOKEN" >> $HOME/.netrc
+
+      - run:
+          name: Installing Ginkgo
+          command: go get -u github.com/onsi/ginkgo/ginkgo
+
+      - run:
+          name: Installing dependencies
+          command: make dep-ensure
+
+      - run:
+          name: Run tests
+          command: |
+            make coverage-ci
