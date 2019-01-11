@@ -2,6 +2,7 @@ package errors
 
 // ErrorWithCode implements an error with a code related to it.
 type ErrorWithCode interface {
+	Error() string
 	Code() string
 }
 

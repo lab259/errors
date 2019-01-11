@@ -2,6 +2,7 @@ package errors
 
 // ErrorWithMessage implements an error with a code related to it.
 type ErrorWithMessage interface {
+	error
 	Message() string
 }
 

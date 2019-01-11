@@ -1,6 +1,11 @@
 package errors
 
+import "errors"
+
 type Option func(err error) error
+
+// New is an alias for the default `errors.New`.
+var New = errors.New
 
 func Http(status int) Option {
 	return func(reason error) error {
