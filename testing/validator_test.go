@@ -1,13 +1,14 @@
 package testing_test
 
 import (
+	"reflect"
+	"strings"
+
 	"github.com/lab259/errors"
 	"github.com/lab259/errors/testing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/go-playground/validator.v9"
-	"reflect"
-	"strings"
 )
 
 var _ = Describe("ErrorWithValidator Test Suite", func() {
@@ -103,6 +104,67 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 			m := testing.ErrorWithValidation("Age")
 
 			result, err := m.Match(wrapError)
+			Expect(result).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should initialize the matcher validation wrap module", func() {
+			type Person struct {
+				Name   string `json:"name"   validate:"required"`
+				Age    int    `json:"age"    validate:"min=0"`
+				Status bool   `json:"status" validate:"-"`
+			}
+
+			person := Person{
+				Name:   "Chico Bento",
+				Age:    -1,
+				Status: true,
+			}
+
+			err := validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			errModule := errors.Module("test")
+
+			wrapError := errors.Wrap(err, errModule, errors.Validation())
+
+			m := testing.ErrorWithValidation("Age")
+
+			result, err := m.Match(wrapError)
+			Expect(result).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should fail initialize the matcher validation wrap module", func() {
+			type Person struct {
+				Name   string `json:"name"   validate:"required"`
+				Age    int    `json:"age"    validate:"min=0"`
+				Status bool   `json:"status" validate:"-"`
+			}
+
+			person := Person{
+				Name:   "Chico Bento",
+				Age:    -10000,
+				Status: true,
+			}
+
+			err := validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			errModule := errors.Module("test")
+			wrapError := errModule(errors.Wrap(err, errors.Validation()))
+
+			// Case invalid
+			m := testing.ErrorWithValidation("Name")
+
+			result, err := m.Match(wrapError)
+			Expect(result).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+
+			// Case valid
+			m = testing.ErrorWithValidation("Age")
+
+			result, err = m.Match(wrapError)
 			Expect(result).To(BeTrue())
 			Expect(err).ToNot(HaveOccurred())
 		})

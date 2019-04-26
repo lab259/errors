@@ -2,10 +2,10 @@ package testing
 
 import (
 	"errors"
-	errors2 "github.com/lab259/errors"
+	"strings"
+
 	"github.com/onsi/gomega/format"
 	"gopkg.in/go-playground/validator.v9"
-	"strings"
 )
 
 type ErrorWithValidatorMatcher struct {
@@ -13,58 +13,27 @@ type ErrorWithValidatorMatcher struct {
 }
 
 func (matcher *ErrorWithValidatorMatcher) Match(actual interface{}) (r bool, rErr error) {
-	switch actual.(type) {
-	case validator.ValidationErrors:
-		validationErrors := actual.(validator.ValidationErrors)
+	err, ok := actual.(error)
+	if !ok {
+		return false, errors.New("`actual` is not an `error`")
+	}
+	if !reasonIterator(err, func(err error) bool {
+		validationErrors, ok := err.(validator.ValidationErrors)
+		if !ok {
+			// returning false means that the iterator will continue going through the errors reasons.
+			return false
+		}
 
 		e := appendMapErrors(validationErrors)
 
-		if checkFieldsMatcher(matcher, e) {
-			return true, nil
-		}
-
-		return false, errors.New(format.Message(actual, "not to have any error equal", matcher.Expected))
-	case *validator.ValidationErrors:
-		if errs, ok := actual.(*validator.ValidationErrors); ok {
-
-			e := appendMapErrors(*errs)
-
-			if checkFieldsMatcher(matcher, e) {
-				return true, nil
-			}
-
-		}
-
-		return false, errors.New(format.Message(actual, "not to have any error equal", matcher.Expected))
-	case errors2.ValidationError:
-		errs := actual.(errors2.ValidationError)
-
-		if validationErrors, ok := errs.Reason().(validator.ValidationErrors); ok {
-			e := appendMapErrors(validationErrors)
-
-			if checkFieldsMatcher(matcher, e) {
-				return true, nil
-			}
-
-		}
-
-		return false, errors.New(format.Message(actual, "not to have any error equal", matcher.Expected))
-	case *errors2.ValidationError:
-		errs := actual.(*errors2.ValidationError)
-
-		if validationErrors, ok := errs.Reason().(validator.ValidationErrors); ok {
-			e := appendMapErrors(validationErrors)
-
-			if checkFieldsMatcher(matcher, e) {
-				return true, nil
-			}
-
-		}
-
-		return false, errors.New(format.Message(actual, "not to have any error equal", matcher.Expected))
+		// returning true means that the iterator is satisfied.
+		r = checkFieldsMatcher(matcher, e)
+		return checkFieldsMatcher(matcher, e)
+	}) {
+		return false, errors.New(format.Message(actual, "to not have any error equal", matcher.Expected))
 	}
 
-	return false, nil
+	return
 }
 
 func (matcher *ErrorWithValidatorMatcher) FailureMessage(actual interface{}) (message string) {
@@ -72,7 +41,7 @@ func (matcher *ErrorWithValidatorMatcher) FailureMessage(actual interface{}) (me
 }
 
 func (matcher *ErrorWithValidatorMatcher) NegatedFailureMessage(actual interface{}) (message string) {
-	return format.Message(actual, "not to have any validation equal", matcher.Expected)
+	return format.Message(actual, "to not have any validation equal", matcher.Expected)
 }
 
 var replacer = strings.NewReplacer("[", ".", "]", "")
