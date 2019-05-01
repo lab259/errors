@@ -8,8 +8,8 @@ import (
 // `errorWithReasonIterator`.
 type errComparatorFnc func(err error) bool
 
-// errorWithReasonIterator calls `fnc` for the error. If `err` is a `ErrorWithReason`, it calls `fnc` passing the reason.
-// Then, repeats until `fnc` returns `false`, or `err` is not `ErrorWithReason`, or the `Reason` is `nil`.
+// errorWithReasonIterator calls `fnc` for the error. If `err` is a `Wrapper`, it calls `fnc` passing the reason.
+// Then, repeats until `fnc` returns `false`, or `err` is not `Wrapper`, or the `Reason` is `nil`.
 func errorWithReasonIterator(err error, fnc errComparatorFnc) bool {
 	for {
 		if fnc(err) {
@@ -24,14 +24,4 @@ func errorWithReasonIterator(err error, fnc errComparatorFnc) bool {
 			return false
 		}
 	}
-}
-
-func reasonIterator(err error, fnc errComparatorFnc) bool {
-	if fnc(err) {
-		return true
-	}
-	for e, ok := err.(errors.ErrorWithReason); ok; {
-		return reasonIterator(e.Reason(), fnc)
-	}
-	return false
 }

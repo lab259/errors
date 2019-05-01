@@ -12,7 +12,7 @@ var _ = Describe("ErrorWithMessage", func() {
 		nerr := errors.New("test")
 		err := lerrors.WrapMessage(nerr, "error code")
 		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(Equal("error code"))
+		Expect(err.Error()).To(Equal("error code: test"))
 
 		errWithMessage, ok := err.(lerrors.ErrorWithMessage)
 		Expect(ok).To(BeTrue())

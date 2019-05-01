@@ -48,5 +48,17 @@ func Wrap(reason error, options ...Option) error {
 }
 
 func Is(err, target error) bool {
-	return false
+	for {
+		if err == target {
+			return true
+		}
+		wrapper, ok := err.(Wrapper)
+		if !ok {
+			return false
+		}
+		err = wrapper.Unwrap()
+		if err == nil {
+			return false
+		}
+	}
 }

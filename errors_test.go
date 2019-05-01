@@ -2,13 +2,16 @@ package errors_test
 
 import (
 	"errors"
+	"log"
+	"testing"
+
 	"github.com/jamillosantos/macchiato"
 	lerrors "github.com/lab259/errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"log"
-	"testing"
 )
+
+var ErrTest = errors.New("this is a test")
 
 type MockErrorResponse struct {
 	Data map[string]interface{}
@@ -68,5 +71,10 @@ var _ = Describe("Wrap", func() {
 		err := lerrors.Wrap(nerr, lerrors.Validation())
 		_, ok := err.(*lerrors.ValidationError)
 		Expect(ok).To(BeTrue())
+	})
+
+	It("should match wrapped error", func() {
+		err := lerrors.Wrap(ErrTest, lerrors.Validation(), lerrors.Module("test"), lerrors.Message("message"))
+		Expect(lerrors.Is(err, ErrTest)).To(BeTrue())
 	})
 })

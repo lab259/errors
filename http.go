@@ -20,7 +20,8 @@ func (err *httpError) StatusCode() int {
 	return err.statusCode
 }
 
-// Reason returns the error that originally was raised.
+// Unwrap returns the next error in the error chain.
+// If there is no next error, Unwrap returns nil.
 func (err *httpError) Unwrap() error {
 	return err.reason
 }

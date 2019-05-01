@@ -2,12 +2,13 @@ package errors_test
 
 import (
 	"errors"
-	"github.com/go-playground/universal-translator"
+	"reflect"
+
+	ut "github.com/go-playground/universal-translator"
 	lerrors "github.com/lab259/errors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/go-playground/validator.v9"
-	"reflect"
 )
 
 type fieldErrorMock struct {
@@ -67,7 +68,7 @@ var _ = Describe("ValidationError", func() {
 		}
 		err := lerrors.WrapValidation(nerr)
 		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(Equal("validation"))
+		Expect(err.Error()).To(Equal(`validation: "namespace" failed on [ActualTag]`))
 
 		errResponse := NewMockErrorResponse()
 
@@ -90,7 +91,7 @@ var _ = Describe("ValidationError", func() {
 		}
 		err := lerrors.WrapValidation(nerr)
 		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(Equal("validation"))
+		Expect(err.Error()).To(Equal(`validation: "fieldName" failed on [ActualTag]`))
 
 		errResponse := NewMockErrorResponse()
 

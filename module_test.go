@@ -12,7 +12,7 @@ var _ = Describe("ModuleError", func() {
 		nerr := errors.New("test")
 		err := lerrors.WrapModule(nerr, "test module")
 		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(Equal("test"))
+		Expect(err.Error()).To(Equal("test module: test"))
 		moduleErr, ok := err.(lerrors.ModuleError)
 		Expect(ok).To(BeTrue())
 		Expect(moduleErr.Module()).To(Equal("test module"))
@@ -29,7 +29,7 @@ var _ = Describe("ModuleError", func() {
 	It("should wrap a ModuleError with no reason", func() {
 		err := lerrors.WrapModule(nil, "test module")
 		Expect(err).NotTo(BeNil())
-		Expect(err.Error()).To(Equal("unknown error"))
+		Expect(err.Error()).To(Equal("test module: unknown error"))
 		moduleErr, ok := err.(lerrors.ModuleError)
 		Expect(ok).To(BeTrue())
 		Expect(moduleErr.Module()).To(Equal("test module"))

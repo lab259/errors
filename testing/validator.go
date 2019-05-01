@@ -21,7 +21,7 @@ func (matcher *ErrorWithValidatorMatcher) Match(actual interface{}) (bool, error
 		return false, errors.New("`actual` is not an `error`")
 	}
 
-	isMatcher := reasonIterator(err, func(err error) bool {
+	isMatcher := errorWithReasonIterator(err, func(err error) bool {
 		validationErrors, ok := err.(validator.ValidationErrors)
 		if !ok {
 			// returning false means that the iterator will continue going through the errors reasons.
