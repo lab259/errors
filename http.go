@@ -21,7 +21,7 @@ func (err *httpError) StatusCode() int {
 }
 
 // Reason returns the error that originally was raised.
-func (err *httpError) Reason() error {
+func (err *httpError) Unwrap() error {
 	return err.reason
 }
 

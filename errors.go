@@ -46,3 +46,7 @@ func Wrap(reason error, options ...Option) error {
 	}
 	return err
 }
+
+func Is(err, target error) bool {
+	return false
+}

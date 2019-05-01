@@ -11,7 +11,7 @@ type moduleError struct {
 }
 
 // Reason is the original error that was raised.
-func (err *moduleError) Reason() error {
+func (err *moduleError) Unwrap() error {
 	return err.reason
 }
 

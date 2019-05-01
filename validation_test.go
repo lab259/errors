@@ -98,9 +98,9 @@ var _ = Describe("ValidationError", func() {
 		Expect(ok).To(BeTrue())
 		validationErr.AppendData(errResponse)
 
-		reasonErr, ok := err.(lerrors.ErrorWithReason)
+		reasonErr, ok := err.(lerrors.Wrapper)
 		Expect(ok).To(BeTrue())
-		Expect(reasonErr.Reason()).To(Equal(nerr))
+		Expect(reasonErr.Unwrap()).To(Equal(nerr))
 
 		Expect(errResponse.Data).To(HaveKey("errors"))
 		m, ok := errResponse.Data["errors"].(map[string][]string)
@@ -121,9 +121,9 @@ var _ = Describe("ValidationError", func() {
 		Expect(ok).To(BeTrue())
 		validationErr.AppendData(errResponse)
 
-		reasonErr, ok := err.(lerrors.ErrorWithReason)
+		reasonErr, ok := err.(lerrors.Wrapper)
 		Expect(ok).To(BeTrue())
-		Expect(reasonErr.Reason()).To(Equal(nerr))
+		Expect(reasonErr.Unwrap()).To(Equal(nerr))
 
 		Expect(errResponse.Data).ToNot(HaveKey("errors"))
 	})

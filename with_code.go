@@ -29,7 +29,7 @@ func (err *errorWithCode) AppendData(response ErrorResponse) {
 }
 
 // Reason is the error that originally was raised.
-func (err *errorWithCode) Reason() error {
+func (err *errorWithCode) Unwrap() error {
 	return err.reason
 }
 

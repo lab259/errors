@@ -43,7 +43,7 @@ func (err *ValidationError) AppendData(response ErrorResponse) {
 	}
 }
 
-func (err *ValidationError) Reason() error {
+func (err *ValidationError) Unwrap() error {
 	return err.reason
 }
 

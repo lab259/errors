@@ -25,8 +25,8 @@ var _ = Describe("ErrorWithMessage", func() {
 		aggErr.AppendData(errResponse)
 		Expect(errResponse.Data).To(HaveKeyWithValue("message", "error code"))
 
-		errWithReason, ok := err.(lerrors.ErrorWithReason)
+		errWithReason, ok := err.(lerrors.Wrapper)
 		Expect(ok).To(BeTrue())
-		Expect(errWithReason.Reason()).To(Equal(nerr))
+		Expect(errWithReason.Unwrap()).To(Equal(nerr))
 	})
 })
