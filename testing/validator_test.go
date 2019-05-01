@@ -30,7 +30,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 			err := validate.Struct(person)
 			Expect(err).To(HaveOccurred())
 
-			m := testing.ErrorWithValidation("Age")
+			m := testing.ErrorWithValidation("Age", "min")
 
 			result, err := m.Match(err)
 			Expect(result).To(BeTrue())
@@ -52,11 +52,105 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 			err := validate.Struct(person)
 			Expect(err).To(HaveOccurred())
 
-			m := testing.ErrorWithValidation("Age", "Name")
+			m := testing.ErrorWithValidation("Name", "required")
 
-			result, err := m.Match(err)
+			result, errMatch := m.Match(err)
 			Expect(result).To(BeTrue())
-			Expect(err).ToNot(HaveOccurred())
+			Expect(errMatch).ToNot(HaveOccurred())
+
+			m = testing.ErrorWithValidation("Age", "min")
+
+			result, errMatch = m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
+		})
+
+		It("should initialize the matcher two field and many rules", func() {
+			type Person struct {
+				Name    string `json:"name"   validate:"required"`
+				Age     int    `json:"age"    validate:"min=0,max=21"`
+				Status  bool   `json:"status" validate:"-"`
+				Tagline string `validate:"required,lt=10"`
+			}
+
+			person := Person{
+				Name:    "Chico Bento",
+				Age:     -1,
+				Status:  true,
+				Tagline: "This tagline is way too long.",
+			}
+
+			err := validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			m := testing.ErrorWithValidation("Age", "min")
+
+			result, errMatch := m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
+
+			person.Age = 22
+
+			err = validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			m = testing.ErrorWithValidation("Age", "max")
+
+			result, errMatch = m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
+
+			m = testing.ErrorWithValidation("Tagline", "lt")
+
+			result, errMatch = m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
+		})
+
+		It("should initialize the matcher email invalid", func() {
+			type Person struct {
+				Name  string `json:"name"   validate:"required"`
+				Age   int    `json:"age"    validate:"min=0,max=21"`
+				Email string `json:"status" validate:"required,email"`
+			}
+
+			person := Person{
+				Name:  "Chico Bento",
+				Age:   20,
+				Email: " ",
+			}
+
+			err := validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			m := testing.ErrorWithValidation("Email", "email")
+
+			result, errMatch := m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
+		})
+
+		It("should initialize the matcher email valid", func() {
+			type Person struct {
+				Name  string `json:"name"   validate:"required"`
+				Age   int    `json:"age"    validate:"min=0,max=21"`
+				Email string `json:"status" validate:"required,email"`
+			}
+
+			person := Person{
+				Name:  "Chico Bento",
+				Age:   20,
+				Email: "not is email.",
+			}
+
+			err := validate.Struct(person)
+			Expect(err).To(HaveOccurred())
+
+			m := testing.ErrorWithValidation("Email", "email")
+
+			result, errMatch := m.Match(err)
+			Expect(result).To(BeTrue())
+			Expect(errMatch).ToNot(HaveOccurred())
 		})
 
 		It("should initialize the matcher fail field pass not matcher", func() {
@@ -101,7 +195,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			wrapError := errors.WrapValidation(err)
 
-			m := testing.ErrorWithValidation("Age")
+			m := testing.ErrorWithValidation("Age", "min")
 
 			result, err := m.Match(wrapError)
 			Expect(result).To(BeTrue())
@@ -128,7 +222,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			wrapError := errors.Wrap(err, errModule, errors.Validation())
 
-			m := testing.ErrorWithValidation("Age")
+			m := testing.ErrorWithValidation("Age", "min")
 
 			result, err := m.Match(wrapError)
 			Expect(result).To(BeTrue())
@@ -138,13 +232,13 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 		It("should fail initialize the matcher validation wrap module", func() {
 			type Person struct {
 				Name   string `json:"name"   validate:"required"`
-				Age    int    `json:"age"    validate:"min=0"`
+				Age    int    `json:"age"    validate:"max=100"`
 				Status bool   `json:"status" validate:"-"`
 			}
 
 			person := Person{
 				Name:   "Chico Bento",
-				Age:    -10000,
+				Age:    101,
 				Status: true,
 			}
 
@@ -155,14 +249,14 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 			wrapError := errModule(errors.Wrap(err, errors.Validation()))
 
 			// Case invalid
-			m := testing.ErrorWithValidation("Name")
+			m := testing.ErrorWithValidation("Name", "required")
 
 			result, err := m.Match(wrapError)
 			Expect(result).To(BeFalse())
 			Expect(err).To(HaveOccurred())
 
 			// Case valid
-			m = testing.ErrorWithValidation("Age")
+			m = testing.ErrorWithValidation("Age", "max")
 
 			result, err = m.Match(wrapError)
 			Expect(result).To(BeTrue())
