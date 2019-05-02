@@ -1,6 +1,6 @@
 <p align="center"> <img src="https://storage.googleapis.com/gopherizeme.appspot.com/gophers/d9349f6fc662ca7d42020f9ec82710751caf5c7a.png" width="250"/></p>
 
-# [WIP] errors [![CircleCI](https://circleci.com/gh/lab259/errors.svg?style=shield&circle-token=c4509080576acf88fa313e2bb5ccabb4787a44fb)](https://circleci.com/gh/lab259/errors)
+# [WIP] errors [![CircleCI](https://circleci.com/gh/lab259/errors.svg?style=shield&circle-token=c4509080576acf88fa313e2bb5ccabb4787a44fb)](https://circleci.com/gh/lab259/errors) [![codecov](https://codecov.io/gh/lab259/errors/branch/master/graph/badge.svg)](https://codecov.io/gh/lab259/errors) [![GoDoc](https://godoc.org/github.com/lab259/errors?status.svg)](http://godoc.org/github.com/lab259/errors) [![Go Report Card](https://goreportcard.com/badge/github.com/lab259/errors)](https://goreportcard.com/report/github.com/lab259/errors)
 
 **THIS DOCUMENT IS A WORK IN PROGRESS**
 

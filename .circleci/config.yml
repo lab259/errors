@@ -9,13 +9,6 @@ jobs:
       - checkout
 
       - run:
-          name: Setup .netrc
-          command: |
-            echo "machine github.com" > $HOME/.netrc
-            echo "    login $GITHUB_USERNAME" >> $HOME/.netrc
-            echo "    password $GITHUB_TOKEN" >> $HOME/.netrc
-
-      - run:
           name: Installing Ginkgo
           command: go get -u github.com/onsi/ginkgo/ginkgo
 
@@ -27,3 +20,5 @@ jobs:
           name: Run tests
           command: |
             make coverage-ci
+
+      - run: bash <(curl -s https://codecov.io/bash)
