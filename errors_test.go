@@ -3,6 +3,7 @@ package errors_test
 import (
 	"errors"
 	"log"
+	"net/http"
 	"testing"
 
 	"github.com/jamillosantos/macchiato"
@@ -42,9 +43,26 @@ var _ = Describe("Wrap", func() {
 		Expect(httpErr.StatusCode()).To(Equal(123))
 	})
 
+	It("should wrap with a HTTPError (plain)", func() {
+		nerr := errors.New("error")
+		err := lerrors.Wrap(nerr, http.StatusNotFound)
+		httpErr, ok := err.(lerrors.HttpError)
+		Expect(ok).To(BeTrue())
+		Expect(httpErr.StatusCode()).To(Equal(404))
+	})
+
 	It("should wrap with a ErrorWithCode", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Code("123"))
+		reportableErr, ok := err.(lerrors.ErrorWithCode)
+		Expect(ok).To(BeTrue())
+		Expect(reportableErr.Code()).To(Equal("123"))
+	})
+
+	It("should wrap with a ErrorWithCode (plain)", func() {
+		code123 := lerrors.WrapCode(nil, "123")
+		nerr := errors.New("error")
+		err := lerrors.Wrap(nerr, code123)
 		reportableErr, ok := err.(lerrors.ErrorWithCode)
 		Expect(ok).To(BeTrue())
 		Expect(reportableErr.Code()).To(Equal("123"))
@@ -58,7 +76,7 @@ var _ = Describe("Wrap", func() {
 		Expect(reportableErr.Message()).To(Equal("123"))
 	})
 
-	It("should wrap with a ErrorWithMessage (plain string)", func() {
+	It("should wrap with a ErrorWithMessage (plain)", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, "123")
 		reportableErr, ok := err.(lerrors.ErrorWithMessage)
@@ -74,6 +92,15 @@ var _ = Describe("Wrap", func() {
 		Expect(moduleErr.Module()).To(Equal("123"))
 	})
 
+	It("should wrap with a ModuleError (plain)", func() {
+		module123 := lerrors.WrapModule(nil, "123")
+		nerr := errors.New("error")
+		err := lerrors.Wrap(nerr, module123)
+		moduleErr, ok := err.(lerrors.ModuleError)
+		Expect(ok).To(BeTrue())
+		Expect(moduleErr.Module()).To(Equal("123"))
+	})
+
 	It("should wrap with a ValidationError", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Validation())
@@ -84,5 +111,10 @@ var _ = Describe("Wrap", func() {
 	It("should match wrapped error", func() {
 		err := lerrors.Wrap(ErrTest, lerrors.Validation(), lerrors.Module("test"), lerrors.Message("message"))
 		Expect(lerrors.Is(err, ErrTest)).To(BeTrue())
+	})
+
+	It("should return reason", func() {
+		err := lerrors.Wrap(ErrTest, lerrors.Validation(), lerrors.Module("test"), lerrors.Message("message"))
+		Expect(lerrors.Reason(err)).To(Equal(ErrTest))
 	})
 })

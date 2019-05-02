@@ -43,8 +43,14 @@ func Wrap(reason error, options ...interface{}) error {
 		switch act := opt.(type) {
 		case Option:
 			err = act(err)
+		case ModuleError:
+			err = WrapModule(err, act.Module())
+		case ErrorWithCode:
+			err = WrapCode(err, act.Code())
 		case string:
 			err = WrapMessage(err, act)
+		case int:
+			err = WrapHttp(err, act)
 		default:
 			continue
 		}
