@@ -1,7 +1,5 @@
 <p align="center"> <img src="https://storage.googleapis.com/gopherizeme.appspot.com/gophers/d9349f6fc662ca7d42020f9ec82710751caf5c7a.png" width="250"/></p>
 
-
-
 # [WIP] errors [![CircleCI](https://circleci.com/gh/lab259/errors.svg?style=shield&circle-token=c4509080576acf88fa313e2bb5ccabb4787a44fb)](https://circleci.com/gh/lab259/errors)
 
 **THIS DOCUMENT IS A WORK IN PROGRESS**
@@ -181,7 +179,7 @@ errors.Wrap(err, CodeProductNotFound)
 #### ValidationError
 
 A special case error for dealing with validation errors from the
-`go-playground/validator` package.
+[`go-playground/validator`](https://github.com/go-playground/validator) package.
 
 **Wrap**: `Validation()`: It returns a default `ValidationError` implementation
 which is also a `ErrorResponseAggregator`.
