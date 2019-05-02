@@ -37,25 +37,26 @@ func Message(message string) Option {
 	}
 }
 
-func Wrap(reason error, options ...interface{}) error {
-	err := reason
-	for _, opt := range options {
-		switch act := opt.(type) {
-		case Option:
-			err = act(err)
-		case ModuleError:
-			err = WrapModule(err, act.Module())
-		case ErrorWithCode:
-			err = WrapCode(err, act.Code())
-		case string:
-			err = WrapMessage(err, act)
-		case int:
-			err = WrapHttp(err, act)
-		default:
-			continue
+func Combine(options ...interface{}) Option {
+	return func(err error) error {
+		for _, opt := range options {
+			switch act := opt.(type) {
+			case Option:
+				err = act(err)
+			case string:
+				err = WrapMessage(err, act)
+			case int:
+				err = WrapHttp(err, act)
+			default:
+				continue
+			}
 		}
+		return err
 	}
-	return err
+}
+
+func Wrap(reason error, options ...interface{}) error {
+	return Combine(options...)(reason)
 }
 
 func Is(err, target error) bool {

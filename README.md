@@ -40,7 +40,7 @@ if err != nil {
 ```
 
 The code above shows an error being wrapped as an HttpError. Upwards, it can
-be checked and the status code, inside of it, can be applied to a possible 
+be checked and the status code, inside of it, can be applied to a possible
 HTTP response structure.
 
 To improve the usage, a `Wrap` function was created:
@@ -64,7 +64,7 @@ if err != nil {
 ```
 
 In this example, `err` was wrapped twice. With a `HttpError` and a
-`ReportableError`. In other words, the error returned is a `ReportableError`
+`ErrorWithCode`. In other words, the error returned is a `ErrorWithCode`
 with a `HttpError` as `Reason`, this `HttpError` has the original err as `Reason`.
 
 ### How do the pieces of info get together?
@@ -91,7 +91,6 @@ Here, the returned error would have its `AppendData` method called, and only
 this one because its `Reason` is not an `ErrorResponseAggregator` (it is the
 original unmarshaling error).
 
-
 ```go
 err := json.Unmarshal(data, &todoItemInput)
 if err != nil {
@@ -99,12 +98,28 @@ if err != nil {
 }
 ```
 
-In this case, a `ReportableError` would have its `AppendData` called, a
+In this case, a `ErrorWithCode` would have its `AppendData` called, a
 `HttpError` would have its `AppendData` called afterwards, and then the original
 the unmarshaling error would be reached and nothing more would happen.
 
-
 ### Error Types
+
+#### ErrorWithMessage
+
+This error adds the `Message` information to the error. The message should be humam readable.
+
+**Wrap**: `Message(message string)`: It returns a default `ErrorWithMessage`
+implementation which is also a `ErrorResponseAggregator`.
+
+**Usage**:
+
+```go
+// using plain string
+errors.Wrap(err, "failed on such task")
+
+// using wrapper
+errors.Wrap(err, errors.Message("failed on such task"))
+```
 
 #### HttpError
 
@@ -112,6 +127,16 @@ This error adds the `StatusCode` information to the error.
 
 **Wrap**: `Http(statusCode int)`: It returns a default `HttpError` implementation
 which is also a `ErrorResponseAggregator`.
+
+**Usage**:
+
+```go
+// using plain int
+errors.Wrap(err, http.StatusNotFound)
+
+// using wrapper
+errors.Wrap(err, errors.Http(http.StatusNotFound))
+```
 
 #### ModuleError
 
@@ -121,20 +146,79 @@ area of the system the error is emerging from.
 **Wrap**: `Module(module string)`: It returns a default `ModuleError` implementation
 which is also a `ErrorResponseAggregator`.
 
-**ErrorWithCode**
+**Usage**:
 
-This error means something special, it marks the error can be reported to the
-final client. Otherwise, the idea is that an unknown error blows to the actor
-which is consuming the system.
+```go
+// using predefined module
+var (
+    ModuleCatalog = errors.Module("catalog")
+)
 
-**Wrap**: `Code(module string)`: It returns a default `CodeError` implementation
+errors.Wrap(err, ModuleCatalog)
+```
+
+#### ErrorWithCode
+
+This error adds the `Code` information to the error. The code refers to a (documented)
+known error.
+
+**Wrap**: `Code(code string)`: It returns a default `CodeError` implementation
 which is also a `ErrorResponseAggregator`.
 
-**ValidationError**
+**Usage**:
 
-A special case error for dealing with validation errors from the 
+```go
+// using predefined code
+var (
+    CodeProductNotFound = errors.Code("product-not-found")
+)
+
+errors.Wrap(err, CodeProductNotFound)
+```
+
+#### ValidationError
+
+A special case error for dealing with validation errors from the
 `go-playground/validator` package.
 
 **Wrap**: `Validation()`: It returns a default `ValidationError` implementation
 which is also a `ErrorResponseAggregator`.
 
+**Usage**:
+
+```go
+// using wrapper
+errors.Wrap(err, errors.Validation())
+
+// add a custom message
+errros.Wrap(err, "custom message", errors.Validation())
+```
+
+### Combining Errors
+
+In the following example, we show how combining is possible:
+
+```go
+// modules.go
+var (
+    ModuleService = errors.Module("services")
+    // another modules...
+)
+
+// services/codes.go
+var (
+    UserNotFound = errors.Combine(errors.Code("users.notFound"), myapp.ModuleService)
+)
+
+// services/users/find.go
+func Find(id string) (*User, error) {
+    // something goes here...
+
+    if err != nil {
+        // instead of `errors.Wrap(err, errors.Code("users.notFound"), errors.Module("services"))`
+        return nil, errors.Wrap(err, codes.UserNotFound)
+    }
+
+    // more...
+}
+```

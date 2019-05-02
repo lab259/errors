@@ -59,15 +59,6 @@ var _ = Describe("Wrap", func() {
 		Expect(reportableErr.Code()).To(Equal("123"))
 	})
 
-	It("should wrap with a ErrorWithCode (plain)", func() {
-		code123 := lerrors.WrapCode(nil, "123")
-		nerr := errors.New("error")
-		err := lerrors.Wrap(nerr, code123)
-		reportableErr, ok := err.(lerrors.ErrorWithCode)
-		Expect(ok).To(BeTrue())
-		Expect(reportableErr.Code()).To(Equal("123"))
-	})
-
 	It("should wrap with a ErrorWithMessage", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Message("123"))
@@ -92,15 +83,6 @@ var _ = Describe("Wrap", func() {
 		Expect(moduleErr.Module()).To(Equal("123"))
 	})
 
-	It("should wrap with a ModuleError (plain)", func() {
-		module123 := lerrors.WrapModule(nil, "123")
-		nerr := errors.New("error")
-		err := lerrors.Wrap(nerr, module123)
-		moduleErr, ok := err.(lerrors.ModuleError)
-		Expect(ok).To(BeTrue())
-		Expect(moduleErr.Module()).To(Equal("123"))
-	})
-
 	It("should wrap with a ValidationError", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Validation())
@@ -116,5 +98,24 @@ var _ = Describe("Wrap", func() {
 	It("should return reason", func() {
 		err := lerrors.Wrap(ErrTest, lerrors.Validation(), lerrors.Module("test"), lerrors.Message("message"))
 		Expect(lerrors.Reason(err)).To(Equal(ErrTest))
+	})
+
+	It("should combine predefined options", func() {
+		testModule := lerrors.Module("test")
+		testOptionsCode := lerrors.Combine(lerrors.Code("test-options"), testModule)
+		err := lerrors.Wrap(ErrTest, testOptionsCode)
+
+		Expect(err.Error()).To(Equal("test: test-options: this is a test"))
+
+		errModule, ok := err.(lerrors.ModuleError)
+		Expect(ok).To(BeTrue())
+		Expect(errModule.Module()).To(Equal("test"))
+
+		errCode, ok := errModule.(lerrors.Wrapper).Unwrap().(lerrors.ErrorWithCode)
+		Expect(ok).To(BeTrue())
+		Expect(errCode.Code()).To(Equal("test-options"))
+
+		errReason := errCode.(lerrors.Wrapper).Unwrap()
+		Expect(errReason).To(Equal(ErrTest))
 	})
 })
