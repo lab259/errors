@@ -37,11 +37,16 @@ func Message(message string) Option {
 	}
 }
 
-func Wrap(reason error, options ...Option) error {
+func Wrap(reason error, options ...interface{}) error {
 	err := reason
 	for _, opt := range options {
-		if opt != nil {
-			err = opt(err)
+		switch act := opt.(type) {
+		case Option:
+			err = act(err)
+		case string:
+			err = WrapMessage(err, act)
+		default:
+			continue
 		}
 	}
 	return err
@@ -60,5 +65,15 @@ func Is(err, target error) bool {
 		if err == nil {
 			return false
 		}
+	}
+}
+
+func Reason(err error) error {
+	for {
+		wrapper, ok := err.(Wrapper)
+		if !ok {
+			return err
+		}
+		err = wrapper.Unwrap()
 	}
 }

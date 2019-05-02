@@ -60,6 +60,26 @@ func (*fieldErrorMock) Translate(ut ut.Translator) string {
 }
 
 var _ = Describe("ValidationError", func() {
+	It("should build the errors in the http.ResponseError (wrapped+custom message)", func() {
+		nerr := validator.ValidationErrors{
+			&fieldErrorMock{
+				namespace: "namespace",
+			},
+		}
+		err := lerrors.Wrap(nerr, "custom message", lerrors.Validation(), lerrors.Code("validation-test"), lerrors.Module("test"))
+		Expect(err).NotTo(BeNil())
+		Expect(err.Error()).To(Equal(`test: validation-test: custom message: "namespace" failed on [ActualTag]`))
+
+		errResponse := NewMockErrorResponse()
+		Expect(lerrors.AggregateToResponse(err, errResponse)).To(BeTrue())
+
+		Expect(errResponse.Data).To(HaveKey("errors"))
+		m, ok := errResponse.Data["errors"].(map[string][]string)
+		Expect(ok).To(BeTrue())
+		Expect(m).To(HaveKey("namespace"))
+		Expect(m["namespace"]).To(ConsistOf("ActualTag"))
+	})
+
 	It("should build the errors in the http.ResponseError", func() {
 		nerr := validator.ValidationErrors{
 			&fieldErrorMock{

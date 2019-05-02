@@ -36,11 +36,13 @@ func (err *ValidationError) Code() string {
 
 func (err *ValidationError) Errors() map[string][]string {
 	if err.errors == nil {
-		if validationErrors, ok := err.reason.(validator.ValidationErrors); ok {
-			err.errors = make(map[string][]string, len(validationErrors))
-			for _, validationErr := range validationErrors {
-				field := getFieldName(validationErr.Namespace())
-				err.errors[field] = append(err.errors[field], validationErr.ActualTag())
+		err.errors = make(map[string][]string, 0)
+		if reason := Reason(err); reason != nil {
+			if validationErrors, ok := reason.(validator.ValidationErrors); ok {
+				for _, validationErr := range validationErrors {
+					field := getFieldName(validationErr.Namespace())
+					err.errors[field] = append(err.errors[field], validationErr.ActualTag())
+				}
 			}
 		}
 	}
@@ -62,12 +64,16 @@ func (err *ValidationError) Unwrap() error {
 }
 
 func (err *ValidationError) Error() string {
+	message := "validation"
 	if err.reason == nil {
-		return "validation"
+		return message
+	}
+	if errWithMessage, ok := err.reason.(ErrorWithMessage); ok {
+		message = errWithMessage.Message()
 	}
 	errors := err.Errors()
 	if len(errors) == 0 {
-		return "validation"
+		return message
 	}
 	buff := bytes.NewBufferString("")
 	for field, rules := range errors {
@@ -76,7 +82,7 @@ func (err *ValidationError) Error() string {
 		}
 		buff.WriteString(fmt.Sprintf(`"%s" failed on %s`, field, rules))
 	}
-	return fmt.Sprintf("validation: %s", buff.String())
+	return fmt.Sprintf("%s: %s", message, buff.String())
 }
 
 func WrapValidation(reason error) error {

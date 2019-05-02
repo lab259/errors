@@ -58,6 +58,14 @@ var _ = Describe("Wrap", func() {
 		Expect(reportableErr.Message()).To(Equal("123"))
 	})
 
+	It("should wrap with a ErrorWithMessage (plain string)", func() {
+		nerr := errors.New("error")
+		err := lerrors.Wrap(nerr, "123")
+		reportableErr, ok := err.(lerrors.ErrorWithMessage)
+		Expect(ok).To(BeTrue())
+		Expect(reportableErr.Message()).To(Equal("123"))
+	})
+
 	It("should wrap with a ModuleError", func() {
 		nerr := errors.New("error")
 		err := lerrors.Wrap(nerr, lerrors.Module("123"))
