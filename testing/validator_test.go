@@ -8,7 +8,7 @@ import (
 	"github.com/lab259/errors/testing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"gopkg.in/go-playground/validator.v9"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 var _ = Describe("ErrorWithValidator Test Suite", func() {
@@ -32,7 +32,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Age", "min")
 
-			result, err := m.Match(err)
+			result, err := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(err).ToNot(HaveOccurred())
 		})
@@ -54,13 +54,13 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Name", "required")
 
-			result, errMatch := m.Match(err)
+			result, errMatch := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 
 			m = testing.ErrorWithValidation("Age", "min")
 
-			result, errMatch = m.Match(err)
+			result, errMatch = m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 		})
@@ -85,7 +85,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Age", "min")
 
-			result, errMatch := m.Match(err)
+			result, errMatch := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 
@@ -96,13 +96,13 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m = testing.ErrorWithValidation("Age", "max")
 
-			result, errMatch = m.Match(err)
+			result, errMatch = m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 
 			m = testing.ErrorWithValidation("Tagline", "lt")
 
-			result, errMatch = m.Match(err)
+			result, errMatch = m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 		})
@@ -125,7 +125,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Email", "email")
 
-			result, errMatch := m.Match(err)
+			result, errMatch := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 		})
@@ -148,7 +148,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Email", "email")
 
-			result, errMatch := m.Match(err)
+			result, errMatch := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeTrue())
 			Expect(errMatch).ToNot(HaveOccurred())
 		})
@@ -170,7 +170,7 @@ var _ = Describe("ErrorWithValidator Test Suite", func() {
 
 			m := testing.ErrorWithValidation("Age", "Status")
 
-			result, err := m.Match(err)
+			result, err := m.Match(errors.Wrap(err, errors.Validation()))
 			Expect(result).To(BeFalse())
 			Expect(err).To(HaveOccurred())
 		})

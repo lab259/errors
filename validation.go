@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/valyala/fasthttp"
-	"gopkg.in/go-playground/validator.v9"
+	validator "gopkg.in/go-playground/validator.v9"
 )
 
 var replacer = strings.NewReplacer("[", ".", "]", "")
@@ -21,6 +21,10 @@ func getFieldName(namespace string) string {
 		return replaceBrackets(parts[1])
 	}
 	return replaceBrackets(namespace)
+}
+
+type ErrorWithValidation interface {
+	Errors() map[string][]string
 }
 
 // ValidationError implements wrapping validation errors into a reportable

@@ -1,11 +1,8 @@
 package testing
 
 import (
-	"errors"
-	"strings"
-
+	"github.com/lab259/errors"
 	"github.com/onsi/gomega/format"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 // ErrorWithValidatorMatcher as struct for validating errors
@@ -22,16 +19,14 @@ func (matcher *ErrorWithValidatorMatcher) Match(actual interface{}) (bool, error
 	}
 
 	isMatcher := errorWithReasonIterator(err, func(err error) bool {
-		validationErrors, ok := err.(validator.ValidationErrors)
+		errWithValidation, ok := err.(errors.ErrorWithValidation)
 		if !ok {
 			// returning false means that the iterator will continue going through the errors reasons.
 			return false
 		}
 
-		e := appendMapErrors(validationErrors)
-
 		// returning true means that the iterator is satisfied.
-		return checkFieldsMatcher(matcher, e)
+		return checkFieldsMatcher(matcher, errWithValidation.Errors())
 	})
 
 	if isMatcher {
@@ -52,30 +47,6 @@ func (matcher *ErrorWithValidatorMatcher) NegatedFailureMessage(actual interface
 	return format.Message(actual, "to not have any validation equal", matcher.Field)
 }
 
-var replacer = strings.NewReplacer("[", ".", "]", "")
-
-func replaceBrackets(field string) string {
-	return replacer.Replace(field)
-}
-
-func getFieldName(namespace string) string {
-	parts := strings.SplitN(namespace, ".", 2)
-	if len(parts) > 1 {
-		return replaceBrackets(parts[1])
-	}
-	return replaceBrackets(namespace)
-}
-
-func appendMapErrors(validationErrors validator.ValidationErrors) map[string][]string {
-	e := make(map[string][]string, 0)
-	for _, validationErr := range validationErrors {
-		field := getFieldName(validationErr.Namespace())
-		e[field] = append(e[field], validationErr.ActualTag())
-	}
-
-	return e
-}
-
 func checkFieldsMatcher(matcher *ErrorWithValidatorMatcher, e map[string][]string) bool {
 	if rules, ok := e[matcher.Field]; ok {
 		for _, rule := range rules {
@@ -84,7 +55,6 @@ func checkFieldsMatcher(matcher *ErrorWithValidatorMatcher, e map[string][]strin
 			}
 		}
 	}
-
 	return false
 }
 
