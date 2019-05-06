@@ -24,11 +24,6 @@
 #   go-tests = true
 #   unused-packages = true
 
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/globalsign/mgo"
-
 [[constraint]]
   name = "github.com/go-playground/universal-translator"
   version = "0.16.0"

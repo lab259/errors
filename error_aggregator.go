@@ -26,8 +26,8 @@ func AggregateToResponse(data interface{}, errResponse ErrorResponse) bool {
 				e.AppendData(errResponse)
 				handled = true
 			}
-			if e, ok := err.(ErrorWithReason); ok {
-				err = e.Reason()
+			if e, ok := err.(Wrapper); ok {
+				err = e.Unwrap()
 				continue
 			}
 			break

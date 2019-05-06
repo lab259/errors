@@ -1,5 +1,7 @@
 package errors
 
+import "fmt"
+
 // ModuleError describes an error that belongs to a module.
 type ModuleError interface {
 	Module() string
@@ -10,8 +12,9 @@ type moduleError struct {
 	module string
 }
 
-// Reason is the original error that was raised.
-func (err *moduleError) Reason() error {
+// Unwrap returns the next error in the error chain.
+// If there is no next error, Unwrap returns nil.
+func (err *moduleError) Unwrap() error {
 	return err.reason
 }
 
@@ -23,9 +26,9 @@ func (err *moduleError) Module() string {
 // Error returns the original reason of the error.
 func (err *moduleError) Error() string {
 	if err.reason == nil {
-		return "unknown error"
+		return fmt.Sprintf("%s: unknown error", err.module)
 	}
-	return err.reason.Error()
+	return fmt.Sprintf("%s: %s", err.module, err.reason.Error())
 }
 
 // AppendData adds the module information to the system.
