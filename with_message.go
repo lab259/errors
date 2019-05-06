@@ -1,8 +1,9 @@
 package errors
 
+import "fmt"
+
 // ErrorWithMessage implements an error with a code related to it.
 type ErrorWithMessage interface {
-	error
 	Message() string
 }
 
@@ -20,7 +21,10 @@ func (err *errorWithMessage) Message() string {
 
 // Error returns the code of the error
 func (err *errorWithMessage) Error() string {
-	return err.message
+	if err.reason == nil {
+		return err.message
+	}
+	return fmt.Sprintf("%s: %s", err.message, err.reason.Error())
 }
 
 // AppendData adds the code to the ErrorResponse.
@@ -28,12 +32,13 @@ func (err *errorWithMessage) AppendData(response ErrorResponse) {
 	response.SetParam("message", err.message)
 }
 
-// Reason is the error that originally was raised.
-func (err *errorWithMessage) Reason() error {
+// Unwrap returns the next error in the error chain.
+// If there is no next error, Unwrap returns nil.
+func (err *errorWithMessage) Unwrap() error {
 	return err.reason
 }
 
-// WrapCode creates a new instance of a Reportable error with the given
+// WrapMessage creates a new instance of a Reportable error with the given
 // code.
 func WrapMessage(reason error, code string) error {
 	return &errorWithMessage{

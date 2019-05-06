@@ -28,13 +28,13 @@ func (matcher *ErrorWithReasonMatcher) Match(actual interface{}) (r bool, rErr e
 			return true
 		}
 
-		errorWithReason, ok := err.(errors.ErrorWithReason)
+		errorWithReason, ok := err.(errors.Wrapper)
 		if !ok {
 			// returning false means the iterator will stop iterating through the chain
 			return false
 		}
 
-		if reflect.DeepEqual(errorWithReason.Reason(), matcher.Expected) {
+		if reflect.DeepEqual(errorWithReason.Unwrap(), matcher.Expected) {
 			r, rErr = true, nil
 			// returning true the iterator will stop
 			return true
