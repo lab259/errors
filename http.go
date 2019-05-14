@@ -1,5 +1,12 @@
 package errors
 
+import (
+	"fmt"
+	"strings"
+
+	"github.com/valyala/fasthttp"
+)
+
 type HttpError interface {
 	StatusCode() int
 }
@@ -12,7 +19,11 @@ type httpError struct {
 
 // Error returns the error message of the original error.
 func (err *httpError) Error() string {
-	return err.reason.Error()
+	message := strings.ToLower(fasthttp.StatusMessage(err.statusCode))
+	if err.reason == nil {
+		return message
+	}
+	return fmt.Sprintf("%s: %s", message, err.reason.Error())
 }
 
 // StatusCode returns the statusCode of the error.
