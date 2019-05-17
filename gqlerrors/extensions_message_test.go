@@ -14,7 +14,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 		Describe("Message", func() {
 
 			It("should check the return extension message", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -33,7 +33,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 
 			It("should check the return message", func() {
 				message := errors.Message("name is required")
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -53,7 +53,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 
 			It("should check the return message type error", func() {
 				message := errors.New("name is required")
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -72,7 +72,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should check the return message type string", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -91,7 +91,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return message when mutate not matcher", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -111,7 +111,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not contains message", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -130,7 +130,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not matcher message option", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -150,7 +150,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not matcher message text", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{

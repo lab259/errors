@@ -1,9 +1,8 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"fmt"
 
-	"github.com/lab259/errors"
 	"github.com/onsi/gomega/format"
 )
 
@@ -22,12 +21,12 @@ func (matcher *errWithGraphQLValidatorMatcher) Match(actual interface{}) (bool, 
 	for _, v := range graphQLError.Errors {
 		validation, ok := v.Extensions["errors"].(map[string]interface{})
 		if !ok {
-			return false, errors.New(fmt.Sprintf("couldn't have key `validation` on the %q", graphQLError))
+			return false, fmt.Errorf("couldn't have key `validation` on the %q", graphQLError)
 		}
 
 		// Matcher field
 		if !checkFieldsMatcher(matcher, validation) {
-			return false, errors.New(fmt.Sprintf("errors not containing key [%s] on the %s", matcher.Field, graphQLError.Errors))
+			return false, fmt.Errorf("errors not containing key [%s] on the %q", matcher.Field, graphQLError.Errors)
 		}
 	}
 

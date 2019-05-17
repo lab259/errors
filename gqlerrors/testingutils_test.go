@@ -1,4 +1,4 @@
-package gqerrors_test
+package gqlerrors_test
 
 import (
 	"log"

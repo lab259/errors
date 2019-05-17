@@ -14,7 +14,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 		Describe("Module", func() {
 
 			It("should check the return extension module", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -33,12 +33,12 @@ var _ = Describe("GraphQL Testing Utils", func() {
 
 			It("should check the return module", func() {
 				module := errors.WrapModule(nil, "users")
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
 							"extensions": map[string]interface{}{
-								"code": "validation",
+								"code":   "validation",
 								"module": "users",
 							},
 						},
@@ -52,12 +52,12 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should check the return module type string", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
 							"extensions": map[string]interface{}{
-								"code": "validation",
+								"code":   "validation",
 								"module": "users",
 							},
 						},
@@ -71,7 +71,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail check the return module empty", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -90,7 +90,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return module when mutate not matcher", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -102,7 +102,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				})
 
 				module := errors.Module("invalid")
-				a := gqlerrors.ErrWithGraphQLModule("mutateInvalid",module)
+				a := gqlerrors.ErrWithGraphQLModule("mutateInvalid", module)
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -110,7 +110,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not contains module", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -129,7 +129,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not matcher module option", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -145,11 +145,10 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(Equal("expected module [unknown error] not equal [validation]"))
 			})
 
 			It("should fail checking the return when error not matcher module text", func() {
-				jsonData := httpexpect.NewObject(&HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -175,7 +174,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				fModule := format.Message(mutate, "to have any module equal field", module)
 				Expect(failureModule).To(Equal(fModule))
 			})
-			
+
 			It("should checking negative failure module", func() {
 				mutate := "mutate"
 				module := "graphql"

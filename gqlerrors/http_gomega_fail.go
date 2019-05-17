@@ -14,7 +14,7 @@ func pruneStack(fullStackTrace string, skip int) int {
 	if len(stack) > 2*(skip+1) {
 		stack = stack[2*(skip+1):]
 	}
-	prunedStack := []string{}
+	prunedStack := make([]string, 0)
 	re := regexp.MustCompile(`\/ginkgo\/|\/pkg\/testing\/|\/pkg\/runtime\/|\/gavv\/httpexpect`)
 	for i := 0; i < len(stack)/2; i++ {
 		if !re.Match([]byte(stack[i*2])) && i >= skip {
