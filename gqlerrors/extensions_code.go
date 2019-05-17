@@ -1,4 +1,4 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func (matcher *errWithGraphQLCodeMatcher) Match(actual interface{}) (bool, error
 	for _, v := range graphQLError.Errors {
 		code, ok := v.Extensions["code"].(string)
 		if !ok {
-			return false, errors.New(fmt.Sprintf("couldn't have key `code` %q", v.Extensions))
+			return false, fmt.Errorf("couldn't have key `code` %q", v.Extensions)
 		}
 
 		switch matcher.Code.(type) {
@@ -29,15 +29,15 @@ func (matcher *errWithGraphQLCodeMatcher) Match(actual interface{}) (bool, error
 			c := matcher.Code.(errors.Option)
 			cError := c(nil).Error()
 			if code != cError {
-				return false, errors.New(fmt.Sprintf("code [%s] not equal [%s]", cError, code))
+				return false, fmt.Errorf("code [%s] not equal [%s]", cError, code)
 
 			}
 		case string:
 			if code != matcher.Code {
-				return false, errors.New(fmt.Sprintf("code [%s] not equal [%s]", matcher.Code, code))
+				return false, fmt.Errorf("code [%s] not equal [%s]", matcher.Code, code)
 			}
 		case nil:
-			return false, errors.New("the code cannot be null")
+			return false, fmt.Errorf("the code cannot be null")
 		}
 
 	}
@@ -46,11 +46,11 @@ func (matcher *errWithGraphQLCodeMatcher) Match(actual interface{}) (bool, error
 }
 
 func (matcher *errWithGraphQLCodeMatcher) FailureMessage(actual interface{}) string {
-	return format.Message(actual, "to have any code equal field [", matcher.Code, "]")
+	return format.Message(actual, "to have any code equal field", matcher.Code)
 }
 
 func (matcher *errWithGraphQLCodeMatcher) NegatedFailureMessage(actual interface{}) string {
-	return format.Message(actual, "to have any code equal field [", matcher.Code, "]")
+	return format.Message(actual, "to have any code equal field", matcher.Code)
 }
 
 func ErrWithGraphQLCode(mutateOrQueryName string, code interface{}) *errWithGraphQLCodeMatcher {

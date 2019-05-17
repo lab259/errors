@@ -1,10 +1,11 @@
-package gqerrors_test
+package gqlerrors_test
 
 import (
 	"github.com/lab259/errors"
-	"github.com/lab259/errors/gqerrors"
+	"github.com/lab259/errors/gqlerrors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/onsi/gomega/format"
 	"gopkg.in/gavv/httpexpect.v1"
 )
 
@@ -13,7 +14,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 		Describe("Code", func() {
 
 			It("should check the return code", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -24,14 +25,14 @@ var _ = Describe("GraphQL Testing Utils", func() {
 					},
 				})
 
-				a := gqerrors.ErrWithGraphQLCode("mutate", "validation")
+				a := gqlerrors.ErrWithGraphQLCode("mutate", "validation")
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeTrue())
 				Expect(err).ToNot(HaveOccurred())
 			})
 
 			It("should fail check the return code when input not object", func() {
-				a := gqerrors.ErrWithGraphQLCode("mutate", "validate")
+				a := gqlerrors.ErrWithGraphQLCode("mutate", "validate")
 				ok, err := a.Match("it is not an object of the type `*httpexpect.Object`")
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -39,7 +40,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail when not matcher extension error", func() {
-				m := gqerrors.ErrWithGraphQLCode("mutate", "validate")
+				m := gqlerrors.ErrWithGraphQLCode("mutate", "validate")
 
 				ok, err := m.Match(&httpexpect.Object{})
 				Expect(ok).To(BeFalse())
@@ -48,7 +49,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return code when mutate not matcher", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -60,7 +61,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				})
 
 				code := errors.Code("invalid")
-				a := gqerrors.ErrWithGraphQLCode("mutateInvalid",code)
+				a := gqlerrors.ErrWithGraphQLCode("mutateInvalid",code)
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -68,7 +69,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not contains code", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -79,7 +80,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 					},
 				})
 
-				a := gqerrors.ErrWithGraphQLCode("mutate", "users")
+				a := gqlerrors.ErrWithGraphQLCode("mutate", "users")
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -87,7 +88,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail to decode when error not matcher", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": map[string]interface{}{
 						"extensions": map[string]interface{}{
@@ -97,14 +98,14 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				})
 
 				code := errors.Code("invalid-account-id")
-				a := gqerrors.ErrWithGraphQLCode("mutate", code)
+				a := gqlerrors.ErrWithGraphQLCode("mutate", code)
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
 			})
 
 			It("should fail checking the return when error not matcher code option", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -116,7 +117,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				})
 
 				op := errors.Code("new-code")
-				a := gqerrors.ErrWithGraphQLCode("mutate", op)
+				a := gqlerrors.ErrWithGraphQLCode("mutate", op)
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -124,7 +125,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not matcher code option nil", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -135,7 +136,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 					},
 				})
 
-				a := gqerrors.ErrWithGraphQLCode("mutate", nil)
+				a := gqlerrors.ErrWithGraphQLCode("mutate", nil)
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
@@ -143,7 +144,7 @@ var _ = Describe("GraphQL Testing Utils", func() {
 			})
 
 			It("should fail checking the return when error not matcher code text", func() {
-				jsonData := httpexpect.NewObject(&gqerrors.HttpGomegaFail{}, map[string]interface{}{
+				jsonData := httpexpect.NewObject(&gqlerrors.HttpGomegaFail{}, map[string]interface{}{
 					"data": map[string]interface{}{"mutate": nil},
 					"errors": []map[string]interface{}{
 						{
@@ -154,17 +155,29 @@ var _ = Describe("GraphQL Testing Utils", func() {
 					},
 				})
 
-				a := gqerrors.ErrWithGraphQLCode("mutate", "graphql")
+				a := gqlerrors.ErrWithGraphQLCode("mutate", "graphql")
 				ok, err := a.Match(jsonData)
 				Expect(ok).To(BeFalse())
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(Equal("code [graphql] not equal [validation]"))
 			})
 
-			It("should", func() {
-				a := gqerrors.ErrWithGraphQLCode("mutate", "graphql")
-				failurea.FailureMessage("mutate")
-
+			It("should checking failure message", func() {
+				mutate := "mutate"
+				code := "graphql"
+				a := gqlerrors.ErrWithGraphQLCode(mutate, code)
+				failureMessage := a.FailureMessage("mutate")
+				fMessage := format.Message(mutate, "to have any code equal field", code)
+				Expect(failureMessage).To(Equal(fMessage))
+			})
+			
+			It("should checking negative failure message", func() {
+				mutate := "mutate"
+				code := "graphql"
+				a := gqlerrors.ErrWithGraphQLCode(mutate, code)
+				failureMessage := a.NegatedFailureMessage("mutate")
+				fMessage := format.Message(mutate, "to have any code equal field", code)
+				Expect(failureMessage).To(Equal(fMessage))
 			})
 
 		})

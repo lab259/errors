@@ -1,38 +1,37 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"fmt"
 
-	"github.com/lab259/errors"
 	"github.com/lab259/graphql/gqlerrors"
 	"gopkg.in/gavv/httpexpect.v1"
 )
 
-type GraphQLError struct {
+type graphQLError struct {
 	Data   map[string]interface{}      `json:"data"`
 	Errors []*gqlerrors.FormattedError `json:"errors"`
 }
 
-func prepare(mutateOrQuery string, actual interface{}) (*GraphQLError, error) {
+func prepare(mutateOrQuery string, actual interface{}) (*graphQLError, error) {
 	data, ok := actual.(*httpexpect.Object)
 	if !ok {
-		return nil, errors.New("`actual` is not an json object")
+		return nil, fmt.Errorf("`actual` is not an json object")
 	}
 
 	// Decoding GraphQL error
-	var graphQLError GraphQLError
-	err := decode(data.Raw(), &graphQLError)
+	var graphQLError graphQLError
+	err := Decode(data.Raw(), &graphQLError)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(graphQLError.Data) == 0 || len(graphQLError.Errors) == 0 {
-		return nil, errors.New(fmt.Sprintf("expected an error is not `%s`", actual))
+		return nil, fmt.Errorf("expected an error is not `%s`", actual)
 	}
 
 	for key := range graphQLError.Data {
 		if key != mutateOrQuery {
-			return nil, errors.New(fmt.Sprintf("expected mutate or query name [%s] not is equal [%s]", key, mutateOrQuery))
+			return nil, fmt.Errorf("expected mutate or query name [%s] not is equal [%s]", key, mutateOrQuery)
 		}
 	}
 
