@@ -1,4 +1,4 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"reflect"
@@ -7,8 +7,8 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-// decode an objects
-func decode(input interface{}, output interface{}) error {
+// Decode an objects
+func Decode(input interface{}, output interface{}) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		TagName: "json",
 		Result:  output,

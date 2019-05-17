@@ -161,6 +161,12 @@ var _ = Describe("GraphQL Testing Utils", func() {
 				Expect(err.Error()).To(Equal("code [graphql] not equal [validation]"))
 			})
 
+			It("should", func() {
+				a := gqerrors.ErrWithGraphQLCode("mutate", "graphql")
+				failurea.FailureMessage("mutate")
+
+			})
+
 		})
 	})
 })
