@@ -1,4 +1,4 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"fmt"
@@ -22,18 +22,20 @@ func (matcher *errWithGraphQLModuleMatcher) Match(actual interface{}) (bool, err
 	for _, v := range graphQLError.Errors {
 		module, ok := v.Extensions["module"].(string)
 		if !ok {
-			return false, errors.New(fmt.Sprintf("couldn't have key `module` \n%q", graphQLError))
+			return false, fmt.Errorf("couldn't have key `module` %q", graphQLError)
 		}
 
 		switch matcher.Module.(type) {
 		case errors.Option:
 			option := matcher.Module.(errors.Option)
 			mModule := option(nil).Error()
-			return matcher.assert(mModule, module)
+			if ok := strings.Contains(mModule, module); !ok {
+				return false, fmt.Errorf("expected module [%s] not equal [%s]", mModule, module)
+			}
 		case string:
 			expected := matcher.Module.(string)
 			if module != expected {
-				return false, errors.New(fmt.Sprintf("expected module [%s] not equal [%s]", module, expected))
+				return false, fmt.Errorf("expected module [%s] not equal [%s]", module, expected)
 			}
 		}
 	}
@@ -42,11 +44,11 @@ func (matcher *errWithGraphQLModuleMatcher) Match(actual interface{}) (bool, err
 }
 
 func (matcher *errWithGraphQLModuleMatcher) FailureMessage(actual interface{}) string {
-	return format.Message(actual, "to have any module equal field [", matcher.Module, "]")
+	return format.Message(actual, "to have any module equal field", matcher.Module)
 }
 
 func (matcher *errWithGraphQLModuleMatcher) NegatedFailureMessage(actual interface{}) string {
-	return format.Message(actual, "to have any module equal field [", matcher.Module, "]")
+	return format.Message(actual, "to have any module equal field", matcher.Module)
 }
 
 func ErrWithGraphQLModule(mutateOrQueryName string, module interface{}) *errWithGraphQLModuleMatcher {
@@ -54,11 +56,4 @@ func ErrWithGraphQLModule(mutateOrQueryName string, module interface{}) *errWith
 		Module:        module,
 		MutateOrQuery: mutateOrQueryName,
 	}
-}
-
-func (matcher *errWithGraphQLModuleMatcher) assert(source, expected string) (bool, error) {
-	if ok := strings.Contains(source, expected); !ok {
-		return false, errors.New(fmt.Sprintf("expected module [%s] not equal [%s]", expected, source))
-	}
-	return true, nil
 }
