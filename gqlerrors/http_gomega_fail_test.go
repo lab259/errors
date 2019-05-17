@@ -1,4 +1,4 @@
-package gqerrors
+package gqlerrors
 
 import (
 	"fmt"
