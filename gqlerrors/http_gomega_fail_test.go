@@ -1,4 +1,4 @@
-package gqlerrors
+package gqlerrors_test
 
 import (
 	"fmt"
@@ -26,11 +26,11 @@ func pruneStack(fullStackTrace string, skip int) int {
 	return -1
 }
 
-type HttpGomegaFail struct {
+type httpGomegaFail struct {
 	Skip int
 }
 
 // Errorf implements Reporter.Errorf.
-func (r *HttpGomegaFail) Errorf(message string, args ...interface{}) {
+func (r *httpGomegaFail) Errorf(message string, args ...interface{}) {
 	ginkgo.Fail(fmt.Sprintf(message, args...), pruneStack(string(debug.Stack()), r.Skip)+1)
 }
