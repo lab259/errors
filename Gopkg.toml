@@ -25,26 +25,6 @@
 #   unused-packages = true
 
 [[constraint]]
-  name = "github.com/go-playground/universal-translator"
-  version = "0.16.0"
-
-[[constraint]]
-  name = "github.com/onsi/ginkgo"
-  version = "1.7.0"
-
-[[constraint]]
-  name = "github.com/onsi/gomega"
-  version = "1.4.3"
-
-[[constraint]]
-  name = "github.com/pkg/errors"
-  version = "0.8.0"
-
-[[constraint]]
-  name = "github.com/valyala/fasthttp"
-  version = "20180529.0.0"
-
-[[constraint]]
   name = "gopkg.in/go-playground/validator.v9"
   version = "9.23.0"
 

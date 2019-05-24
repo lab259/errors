@@ -61,14 +61,6 @@
   version = "v0.16.0"
 
 [[projects]]
-  digest = "1:bed9d72d596f94e65fff37f4d6c01398074a6bb1c3f3ceff963516bd01db6ff5"
-  name = "github.com/gofrs/uuid"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "6b08a5c5172ba18946672b49749cde22873dd7c2"
-  version = "v3.2.0"
-
-[[projects]]
   digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
   name = "github.com/google/go-querystring"
   packages = ["query"]
@@ -271,7 +263,7 @@
   version = "v1.0.0"
 
 [[projects]]
-  digest = "1:15ad8a80098fcc7a194b9db6b26d74072a852e4faa957848c8118193d3c69230"
+  digest = "1:8d6e2d89065f56a560ce647c05cc8add82ca5d214bcb6cc8b3f4e9329fa6898b"
   name = "github.com/valyala/fasthttp"
   packages = [
     ".",
@@ -279,8 +271,8 @@
     "stackless",
   ]
   pruneopts = "UT"
-  revision = "e5f51c11919d4f66400334047b897ef0a94c6f3c"
-  version = "v20180529"
+  revision = "46469b532d0621287a2184a890564a59a3d528f3"
+  version = "v1.3.0"
 
 [[projects]]
   branch = "master"
@@ -434,7 +426,6 @@
   analyzer-version = 1
   input-imports = [
     "github.com/go-playground/universal-translator",
-    "github.com/gofrs/uuid",
     "github.com/jamillosantos/macchiato",
     "github.com/lab259/graphql/gqlerrors",
     "github.com/lab259/mapstructure",
