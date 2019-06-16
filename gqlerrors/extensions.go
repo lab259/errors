@@ -40,7 +40,7 @@ func prepare(mutateOrQuery string, actual interface{}) (*graphQLError, error) {
 		return nil, err
 	}
 
-	if len(graphQLError.Data) == 0 || len(graphQLError.Errors) == 0 {
+	if len(graphQLError.Errors) == 0 {
 		return nil, fmt.Errorf("expected an error is not `%s`", actual)
 	}
 

@@ -26,8 +26,10 @@ coverage-html:
 	@$(GOPATHCMD) go tool cover -html="${COVERAGEFILE}" -o .cover/report.html
 
 dep-ensure:
-#	@mkdir -p ${GOPATH}
 	@$(GOPATHCMD) dep ensure -v
+
+dep-update: 
+	@$(GOPATHCMD) dep ensure -update -v ${PACKAGE}
 
 deps-ci:
 	@go get -v -t -d ./...
