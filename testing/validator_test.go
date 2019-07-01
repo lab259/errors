@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/lab259/errors"
-	"github.com/lab259/errors/testing"
+	"github.com/lab259/errors/v2"
+	"github.com/lab259/errors/v2/testing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	validator "gopkg.in/go-playground/validator.v9"

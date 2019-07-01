@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lab259/errors"
+	"github.com/lab259/errors/v2"
 	"github.com/onsi/gomega/format"
 )
 
@@ -22,7 +22,7 @@ func (matcher *errWithGraphQLModuleMatcher) Match(actual interface{}) (bool, err
 	for _, v := range graphQLError.Errors {
 		module, ok := v.Extensions["module"].(string)
 		if !ok {
-			return false, fmt.Errorf("couldn't have key `module` %q", graphQLError)
+			return false, fmt.Errorf("couldn't have key `module` %v", graphQLError)
 		}
 
 		switch matcher.Module.(type) {

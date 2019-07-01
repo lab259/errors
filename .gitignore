@@ -13,6 +13,7 @@
 *.coverprofile
 .cover/
 coverage.txt
+test-results/
 
 # Dependencies
 vendor/

@@ -1,8 +1,8 @@
 package testing_test
 
 import (
-	"github.com/lab259/errors"
-	"github.com/lab259/errors/testing"
+	"github.com/lab259/errors/v2"
+	"github.com/lab259/errors/v2/testing"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/valyala/fasthttp"

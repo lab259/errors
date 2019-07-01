@@ -1,20 +1,17 @@
-GOPATH=$(CURDIR)/../../../../
-GOPATHCMD=GOPATH=$(GOPATH)
-
 COVERDIR=$(CURDIR)/.cover
 COVERAGEFILE=$(COVERDIR)/cover.out
 
-.PHONY: deps deps-ci coverage coverage-ci test test-watch coverage coverage-html
+.PHONY: test test-watch coverage coverage-html coverage-ci vet fmt
 
 test:
-	@${GOPATHCMD} ginkgo --failFast ./...
+	@ginkgo --failFast ./...
 
 test-watch:
-	@${GOPATHCMD} ginkgo watch -cover -r ./...
+	@ginkgo watch -cover -r ./...
 
 coverage-ci:
 	@mkdir -p $(COVERDIR)
-	@${GOPATHCMD} ginkgo -r -covermode=count --cover --trace ./
+	@ginkgo -r -covermode=count --cover --trace ./
 	@echo "mode: count" > "${COVERAGEFILE}"
 	@find ./* -type f -name *.coverprofile -exec grep -h -v "^mode:" {} >> "${COVERAGEFILE}" \; -exec rm -f {} \;
 
@@ -23,19 +20,10 @@ coverage: coverage-ci
 	@cp "${COVERAGEFILE}" coverage.txt
 
 coverage-html:
-	@$(GOPATHCMD) go tool cover -html="${COVERAGEFILE}" -o .cover/report.html
-
-dep-ensure:
-	@$(GOPATHCMD) dep ensure -v
-
-dep-update: 
-	@$(GOPATHCMD) dep ensure -update -v ${PACKAGE}
-
-deps-ci:
-	@go get -v -t -d ./...
+	@go tool cover -html="${COVERAGEFILE}" -o .cover/report.html
 
 vet:
-	@$(GOPATHCMD) go vet ./...
+	@go vet ./...
 
 fmt:
-	@$(GOPATHCMD) go fmt ./...
+	@go fmt ./...

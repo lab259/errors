@@ -1,7 +1,7 @@
 package gqlerrors_test
 
 import (
-	"github.com/lab259/errors/gqlerrors"
+	"github.com/lab259/errors/v2/gqlerrors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
@@ -77,7 +77,7 @@ var _ = Describe("GraphQL Extensions Validate", func() {
 		ok, err := a.Match(jsonData)
 		Expect(ok).To(BeFalse())
 		Expect(err).To(HaveOccurred())
-		Expect(err.Error()).To(Equal("errors not containing key [email] on the [\"\"]"))
+		Expect(err.Error()).To(ContainSubstring("errors not containing key [email] on the"))
 	})
 
 	It("should fail checking the return when error not matcher errors", func() {

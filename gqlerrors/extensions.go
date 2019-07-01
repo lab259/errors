@@ -3,14 +3,19 @@ package gqlerrors
 import (
 	"fmt"
 
-	"github.com/lab259/graphql/gqlerrors"
-	"github.com/lab259/mapstructure"
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/gavv/httpexpect.v1"
 )
 
+type FormattedError struct {
+	Message       string                    `json:"message"`
+	Extensions    map[string]interface{}    `json:"extensions,omitempty"`
+}
+
+
 type graphQLError struct {
 	Data   map[string]interface{}      `json:"data"`
-	Errors []*gqlerrors.FormattedError `json:"errors"`
+	Errors []*FormattedError `json:"errors"`
 }
 
 // decode an objects

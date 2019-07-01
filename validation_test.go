@@ -5,7 +5,7 @@ import (
 	"reflect"
 
 	ut "github.com/go-playground/universal-translator"
-	lerrors "github.com/lab259/errors"
+	lerrors "github.com/lab259/errors/v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"gopkg.in/go-playground/validator.v9"

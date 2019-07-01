@@ -1,8 +1,8 @@
 package gqlerrors_test
 
 import (
-	"github.com/lab259/errors"
-	"github.com/lab259/errors/gqlerrors"
+	"github.com/lab259/errors/v2"
+	"github.com/lab259/errors/v2/gqlerrors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/format"
