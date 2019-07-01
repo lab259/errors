@@ -5,9 +5,12 @@ import (
 	"log"
 	"net/http"
 	"testing"
+	"os"
+	"path"
+	"github.com/onsi/ginkgo/reporters"
 
 	"github.com/jamillosantos/macchiato"
-	lerrors "github.com/lab259/errors"
+	lerrors "github.com/lab259/errors/v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -31,7 +34,17 @@ func NewMockErrorResponse() *MockErrorResponse {
 func TestErrors(t *testing.T) {
 	log.SetOutput(GinkgoWriter)
 	RegisterFailHandler(Fail)
-	macchiato.RunSpecs(t, "Errors Test Suite")
+	description := "Errors Test Suite"
+
+	if os.Getenv("CI") == "" {
+		macchiato.RunSpecs(t, description)
+	} else {
+		reporterOutputDir := "./test-results/errors"
+		os.MkdirAll(reporterOutputDir, os.ModePerm)
+		junitReporter := reporters.NewJUnitReporter(path.Join(reporterOutputDir, "results.xml"))
+		macchiatoReporter := macchiato.NewReporter()
+		RunSpecsWithCustomReporters(t, description, []Reporter{macchiatoReporter, junitReporter})
+	}
 }
 
 var _ = Describe("Wrap", func() {

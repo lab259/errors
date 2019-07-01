@@ -2,19 +2,22 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10.3
+      - image: circleci/golang:1.12
 
-    working_directory: /go/src/github.com/lab259/errors
     steps:
       - checkout
-
+      - restore_cache:
+          keys:
+            - deps-{{ .Branch }}-{{ checksum "go.sum" }}
+            - deps-{{ .Branch }}-
+            - deps-
       - run:
           name: Installing Ginkgo
-          command: go get -u github.com/onsi/ginkgo/ginkgo
+          command: go get github.com/onsi/ginkgo/ginkgo
 
       - run:
           name: Installing dependencies
-          command: make dep-ensure
+          command: go mod download
 
       - run:
           name: Run tests
@@ -22,3 +25,11 @@ jobs:
             make coverage-ci
 
       - run: bash <(curl -s https://codecov.io/bash)
+
+      - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum "go.sum" }}
+          paths:
+            - /go/pkg/mod
+
+      - store_test_results:
+          path: test-results

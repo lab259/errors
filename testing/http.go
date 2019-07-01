@@ -5,7 +5,7 @@ import (
 
 	"github.com/onsi/gomega/format"
 
-	"github.com/lab259/errors"
+	"github.com/lab259/errors/v2"
 )
 
 // HttpErrorMatcher is the matcher that can find HttpError in the error chain and check its value.

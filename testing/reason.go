@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/lab259/errors"
+	"github.com/lab259/errors/v2"
 	"github.com/onsi/gomega/format"
 )
 

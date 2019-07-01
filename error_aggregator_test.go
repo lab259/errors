@@ -2,7 +2,7 @@ package errors_test
 
 import (
 	"errors"
-	lerrors "github.com/lab259/errors"
+	lerrors "github.com/lab259/errors/v2"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

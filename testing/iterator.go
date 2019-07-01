@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"github.com/lab259/errors"
+	"github.com/lab259/errors/v2"
 )
 
 // errComparatorFnc is the method signature that will be called to "visit" each error and its reason with the

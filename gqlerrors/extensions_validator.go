@@ -21,12 +21,12 @@ func (matcher *errWithGraphQLValidatorMatcher) Match(actual interface{}) (bool, 
 	for _, v := range graphQLError.Errors {
 		validation, ok := v.Extensions["errors"].(map[string]interface{})
 		if !ok {
-			return false, fmt.Errorf("couldn't have key `validation` on the %q", graphQLError)
+			return false, fmt.Errorf("couldn't have key `validation` on the %v", graphQLError)
 		}
 
 		// Matcher field
 		if !checkFieldsMatcher(matcher, validation) {
-			return false, fmt.Errorf("errors not containing key [%s] on the %q", matcher.Field, graphQLError.Errors)
+			return false, fmt.Errorf("errors not containing key [%s] on the %v", matcher.Field, graphQLError.Errors)
 		}
 	}
 
