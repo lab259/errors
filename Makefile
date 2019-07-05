@@ -1,5 +1,6 @@
 COVERDIR=$(CURDIR)/.cover
 COVERAGEFILE=$(COVERDIR)/cover.out
+COVERAGEREPORT=$(COVERDIR)/report.html
 
 .PHONY: test test-watch coverage coverage-html coverage-ci vet fmt
 
@@ -20,7 +21,8 @@ coverage: coverage-ci
 	@cp "${COVERAGEFILE}" coverage.txt
 
 coverage-html:
-	@go tool cover -html="${COVERAGEFILE}" -o .cover/report.html
+	@go tool cover -html="${COVERAGEFILE}" -o $(COVERAGEREPORT)
+	@xdg-open $(COVERAGEREPORT) 2> /dev/null > /dev/null
 
 vet:
 	@go vet ./...

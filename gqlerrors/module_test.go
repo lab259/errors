@@ -1,6 +1,10 @@
 package gqlerrors_test
 
 import (
+	"encoding/json"
+
+	"github.com/99designs/gqlgen/client"
+	"github.com/lab259/errors/v2"
 	"github.com/lab259/errors/v2/gqlerrors"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -8,175 +12,135 @@ import (
 )
 
 var _ = Describe("GraphQL Extensions", func() {
-
 	Describe("HaveModule", func() {
-
-		It("should check the return extension module", func() {
+		It("should match", func() {
 			gqlerr := gqlerror.Error{
 				Extensions: map[string]interface{}{
-					"module": "users",
+					"module": "api",
 				},
 			}
 
-			a := gqlerrors.HaveModule("users")
+			a := gqlerrors.HaveModule("api")
 			ok, err := a.Match(gqlerr)
 			Expect(ok).To(BeTrue())
 			Expect(err).ToNot(HaveOccurred())
 		})
 
+		It("should match using Option", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule(errors.Module("api"))
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should match using ErrorWithModule", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule(errors.Module("api")(nil))
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should match (pointer)", func() {
+			gqlerr := &gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule("api")
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should match (json.RawMessage)", func() {
+			gqlerr := json.RawMessage(`[{"extensions": {"module": "api"}}]`)
+			a := gqlerrors.HaveModule("api")
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should match (client.RawJsonError)", func() {
+			gqlerr := client.RawJsonError{json.RawMessage(`[{"extensions": {"module": "api"}}]`)}
+			a := gqlerrors.HaveModule("api")
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeTrue())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should not match", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule("not-found")
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeFalse())
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should fail without extensions", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{},
+			}
+
+			a := gqlerrors.HaveModule("api")
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("Module extension not found in"))
+		})
+
+		It("should fail with wrong errors.Option", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule(errors.Code("api"))
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("HaveModule matcher only support an `errors.Module` option"))
+		})
+
+		It("should fail with wrong actual type", func() {
+			a := gqlerrors.HaveModule("api")
+			ok, err := a.Match(26)
+			Expect(ok).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("HaveModule matcher does not know how to handle int"))
+		})
+
+		It("should fail with wrong expected type", func() {
+			gqlerr := gqlerror.Error{
+				Extensions: map[string]interface{}{
+					"module": "api",
+				},
+			}
+
+			a := gqlerrors.HaveModule(26)
+			ok, err := a.Match(gqlerr)
+			Expect(ok).To(BeFalse())
+			Expect(err).To(HaveOccurred())
+			Expect(err.Error()).To(ContainSubstring("HaveModule matcher does not know how to assert int"))
+		})
 	})
-
-	// It("should check the return module", func() {
-	// 	module := errors.WrapModule(nil, "users")
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"code":   "validation",
-	// 					"module": "users",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", module)
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeTrue())
-	// 	Expect(err).ToNot(HaveOccurred())
-	// })
-
-	// It("should check the return module type string", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"code":   "validation",
-	// 					"module": "users",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", "users")
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeTrue())
-	// 	Expect(err).ToNot(HaveOccurred())
-	// })
-
-	// It("should fail check the return module empty", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"code": "validation",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", "users")
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeFalse())
-	// 	Expect(err).To(HaveOccurred())
-	// 	Expect(err.Error()).To(ContainSubstring("couldn't have key `module`"))
-	// })
-
-	// It("should fail checking the return module when mutate not matcher", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"module": "validation",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	module := errors.Module("invalid")
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutateInvalid", module)
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeFalse())
-	// 	Expect(err).To(HaveOccurred())
-	// 	Expect(err.Error()).To(Equal("expected mutate or query name [mutate] not is equal [mutateInvalid]"))
-	// })
-
-	// It("should fail checking the return when error not contains module", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"module": "accounts",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", "users")
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeFalse())
-	// 	Expect(err).To(HaveOccurred())
-	// 	Expect(err.Error()).To(Equal("expected module [accounts] not equal [users]"))
-	// })
-
-	// It("should fail checking the return when error not matcher module option", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"module": "validation",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	option := errors.Module("new-module")
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", option)
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeFalse())
-	// 	Expect(err).To(HaveOccurred())
-	// })
-
-	// It("should fail checking the return when error not matcher module text", func() {
-	// 	jsonData := httpexpect.NewObject(&httpGomegaFail{}, map[string]interface{}{
-	// 		"data": map[string]interface{}{"mutate": nil},
-	// 		"errors": []map[string]interface{}{
-	// 			{
-	// 				"extensions": map[string]interface{}{
-	// 					"module": "validation",
-	// 				},
-	// 			},
-	// 		},
-	// 	})
-
-	// 	a := gqlerrors.ErrWithGraphQLModule("mutate", "graphql")
-	// 	ok, err := a.Match(jsonData)
-	// 	Expect(ok).To(BeFalse())
-	// 	Expect(err).To(HaveOccurred())
-	// 	Expect(err.Error()).To(Equal("expected module [validation] not equal [graphql]"))
-	// })
-
-	// It("should checking failure module", func() {
-	// 	mutate := "mutate"
-	// 	module := "graphql"
-	// 	a := gqlerrors.ErrWithGraphQLModule(mutate, module)
-	// 	failureModule := a.FailureMessage("mutate")
-	// 	fModule := format.Message(mutate, "to have any module equal field", module)
-	// 	Expect(failureModule).To(Equal(fModule))
-	// })
-
-	// It("should checking negative failure module", func() {
-	// 	mutate := "mutate"
-	// 	module := "graphql"
-	// 	a := gqlerrors.ErrWithGraphQLModule(mutate, module)
-	// 	failureModule := a.NegatedFailureMessage("mutate")
-	// 	fModule := format.Message(mutate, "to have any module equal field", module)
-	// 	Expect(failureModule).To(Equal(fModule))
-	// })
 
 })
