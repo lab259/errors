@@ -110,7 +110,7 @@ var _ = Describe("GraphQL Extensions", func() {
 				},
 			}
 
-			a := gqlerrors.HaveValidation("age", "min")
+			a := gqlerrors.HaveValidation("age", "required")
 			ok, err := a.Match(gqlerr)
 			Expect(ok).To(BeFalse())
 			Expect(err).ToNot(HaveOccurred())
