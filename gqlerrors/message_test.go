@@ -74,7 +74,9 @@ var _ = Describe("GraphQL Extensions", func() {
 		})
 
 		It("should match (client.RawJsonError)", func() {
-			gqlerr := client.RawJsonError{json.RawMessage(`[{"extensions": {"message": "name is required"}}]`)}
+			gqlerr := client.RawJsonError{
+				RawMessage: json.RawMessage(`[{"extensions": {"message": "name is required"}}]`),
+			}
 			a := gqlerrors.HaveMessage("name is required")
 			ok, err := a.Match(gqlerr)
 			Expect(ok).To(BeTrue())
@@ -199,7 +201,9 @@ var _ = Describe("GraphQL Extensions", func() {
 			})
 
 			It("should match (client.RawJsonError)", func() {
-				gqlerr := client.RawJsonError{json.RawMessage(`[{"message": "name is required"}]`)}
+				gqlerr := client.RawJsonError{
+					RawMessage: json.RawMessage(`[{"message": "name is required"}]`),
+				}
 				a := gqlerrors.ContainMessage("name is required")
 				ok, err := a.Match(gqlerr)
 				Expect(ok).To(BeTrue())
@@ -312,7 +316,9 @@ var _ = Describe("GraphQL Extensions", func() {
 			})
 
 			It("should match (client.RawJsonError)", func() {
-				gqlerr := client.RawJsonError{json.RawMessage(`[{"extensions": {"message": "name is required"}}]`)}
+				gqlerr := client.RawJsonError{
+					RawMessage: json.RawMessage(`[{"extensions": {"message": "name is required"}}]`),
+				}
 				a := gqlerrors.ContainMessage("name is required")
 				ok, err := a.Match(gqlerr)
 				Expect(ok).To(BeTrue())
