@@ -2,12 +2,12 @@ package errors_test
 
 import (
 	"errors"
+	"github.com/onsi/ginkgo/reporters"
 	"log"
 	"net/http"
-	"testing"
 	"os"
 	"path"
-	"github.com/onsi/ginkgo/reporters"
+	"testing"
 
 	"github.com/jamillosantos/macchiato"
 	lerrors "github.com/lab259/errors/v2"

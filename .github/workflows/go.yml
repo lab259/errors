@@ -19,5 +19,11 @@ jobs:
     - name: Get dependencies
       run: go mod download
 
+    - name: Ensure the project is formatted
+      run: test -z "$(go fmt ./...)"
+
+    - name: Analyse Go code using `vet`
+      run: go vet ./...
+
     - name: Test
       run: go run github.com/onsi/ginkgo/ginkgo -r -requireSuite --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2

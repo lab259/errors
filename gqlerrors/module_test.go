@@ -74,7 +74,9 @@ var _ = Describe("GraphQL Extensions", func() {
 		})
 
 		It("should match (client.RawJsonError)", func() {
-			gqlerr := client.RawJsonError{json.RawMessage(`[{"extensions": {"module": "api"}}]`)}
+			gqlerr := client.RawJsonError{
+				RawMessage: json.RawMessage(`[{"extensions": {"module": "api"}}]`),
+			}
 			a := gqlerrors.HaveModule("api")
 			ok, err := a.Match(gqlerr)
 			Expect(ok).To(BeTrue())
