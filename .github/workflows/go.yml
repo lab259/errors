@@ -20,4 +20,4 @@ jobs:
       run: go mod download
 
     - name: Test
-      run: go run github.com/onsi/ginkgo/ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
+      run: go run github.com/onsi/ginkgo/ginkgo -r -requireSuite --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --compilers=2
