@@ -7,7 +7,6 @@ import (
 	"github.com/lab259/errors/v2"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
-	"github.com/vektah/gqlparser/gqlerror"
 )
 
 // HaveModule succeeds if actual is a GraphQL Error that have the
@@ -19,22 +18,34 @@ func HaveModule(expected interface{}) types.GomegaMatcher {
 }
 
 type haveModuleMatcher struct {
-	err      gqlerror.Error
+	err      interface{}
 	module   string
 	expected interface{}
 }
 
-func (matcher *haveModuleMatcher) Match(actual interface{}) (bool, error) {
+func (matcher *haveModuleMatcher) Match(actual interface{}) (ok bool, err error) {
 	gqlerror, err := prepare("HaveModule", actual)
 	if err != nil {
 		return false, err
 	}
 
-	matcher.err = *gqlerror
+	var module string
+	if gqlerror.Gqlerror != nil {
+		module, ok = gqlerror.Gqlerror.Extensions["module"].(string)
+		if !ok {
+			return false, fmt.Errorf("Module extension not found in %s", gqlerror)
+		}
 
-	module, ok := gqlerror.Extensions["module"].(string)
-	if !ok {
-		return false, fmt.Errorf("Module extension not found in %s", gqlerror)
+		matcher.err = gqlerror.Gqlerror
+	}
+
+	if gqlerror.FormattedError != nil {
+		module, ok = gqlerror.FormattedError.Extensions["module"].(string)
+		if !ok {
+			return false, fmt.Errorf("Module extension not found in %s", gqlerror)
+		}
+
+		matcher.err = gqlerror.FormattedError
 	}
 
 	switch t := matcher.expected.(type) {
