@@ -6,7 +6,6 @@ import (
 
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
-	"github.com/vektah/gqlparser/gqlerror"
 )
 
 // HaveValidation succeeds if actual is a GraphQL Error that have the
@@ -19,22 +18,38 @@ func HaveValidation(field string, rules ...string) types.GomegaMatcher {
 }
 
 type haveValidationMatcher struct {
-	err    gqlerror.Error
+	err    interface{}
 	errors map[string]interface{}
 	field  string
 	rules  []string
 }
 
-func (matcher *haveValidationMatcher) Match(actual interface{}) (bool, error) {
+func (matcher *haveValidationMatcher) Match(actual interface{}) (ok bool, err error) {
 	gqlerror, err := prepare("HaveValidation", actual)
 	if err != nil {
 		return false, err
 	}
 
-	matcher.err = *gqlerror
+	var errors map[string]interface{}
+	if gqlerror.Gqlerror != nil {
+		errors, ok = gqlerror.Gqlerror.Extensions["errors"].(map[string]interface{})
+		if !ok {
+			return false, fmt.Errorf("Validation extension not found in %s", gqlerror)
+		}
 
-	errors, ok := gqlerror.Extensions["errors"].(map[string]interface{})
-	if !ok {
+		matcher.err = gqlerror.Gqlerror
+	}
+
+	if gqlerror.FormattedError != nil {
+		errors, ok = gqlerror.FormattedError.Extensions["errors"].(map[string]interface{})
+		if !ok {
+			return false, fmt.Errorf("Validation extension not found in %s", gqlerror)
+		}
+
+		matcher.err = gqlerror.FormattedError
+	}
+
+	if gqlerror.Gqlerror == nil && gqlerror.FormattedError == nil {
 		return false, fmt.Errorf("Validation extension not found in %s", gqlerror)
 	}
 

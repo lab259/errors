@@ -7,7 +7,6 @@ import (
 	"github.com/lab259/errors/v2"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
-	"github.com/vektah/gqlparser/gqlerror"
 )
 
 // HaveCode succeeds if actual is a GraphQL Error that have the
@@ -19,22 +18,34 @@ func HaveCode(expected interface{}) types.GomegaMatcher {
 }
 
 type haveCodeMatcher struct {
-	err      gqlerror.Error
+	err      interface{}
 	code     string
 	expected interface{}
 }
 
-func (matcher *haveCodeMatcher) Match(actual interface{}) (bool, error) {
+func (matcher *haveCodeMatcher) Match(actual interface{}) (ok bool, err error) {
 	gqlerror, err := prepare("HaveCode", actual)
 	if err != nil {
 		return false, err
 	}
 
-	matcher.err = *gqlerror
+	var code string
+	if gqlerror.Gqlerror != nil {
+		code, ok = gqlerror.Gqlerror.Extensions["code"].(string)
+		if !ok {
+			return false, fmt.Errorf("Code extension not found in %s", gqlerror)
+		}
 
-	code, ok := gqlerror.Extensions["code"].(string)
-	if !ok {
-		return false, fmt.Errorf("Code extension not found in %s", gqlerror)
+		matcher.err = gqlerror.Gqlerror
+	}
+
+	if gqlerror.FormattedError != nil {
+		code, ok = gqlerror.FormattedError.Extensions["code"].(string)
+		if !ok {
+			return false, fmt.Errorf("Code extension not found in %s", gqlerror)
+		}
+
+		matcher.err = gqlerror.FormattedError
 	}
 
 	switch t := matcher.expected.(type) {

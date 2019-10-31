@@ -8,7 +8,6 @@ import (
 	"github.com/lab259/errors/v2"
 	"github.com/onsi/gomega/format"
 	"github.com/onsi/gomega/types"
-	"github.com/vektah/gqlparser/gqlerror"
 )
 
 // HaveMessage succeeds if actual is a GraphQL Error that have the
@@ -20,22 +19,34 @@ func HaveMessage(expected interface{}) types.GomegaMatcher {
 }
 
 type haveMessageMatcher struct {
-	err      gqlerror.Error
+	err      interface{}
 	message  string
 	expected interface{}
 }
 
-func (matcher *haveMessageMatcher) Match(actual interface{}) (bool, error) {
+func (matcher *haveMessageMatcher) Match(actual interface{}) (ok bool, err error) {
 	gqlerror, err := prepare("HaveMessage", actual)
 	if err != nil {
 		return false, err
 	}
 
-	matcher.err = *gqlerror
+	var message string
+	if gqlerror.Gqlerror != nil {
+		message, ok = gqlerror.Gqlerror.Extensions["message"].(string)
+		if !ok {
+			return false, fmt.Errorf("Message extension not found in %s", gqlerror)
+		}
 
-	message, ok := gqlerror.Extensions["message"].(string)
-	if !ok {
-		return false, fmt.Errorf("Message extension not found in %s", gqlerror)
+		matcher.err = gqlerror.Gqlerror
+	}
+
+	if gqlerror.FormattedError != nil {
+		message, ok = gqlerror.FormattedError.Extensions["message"].(string)
+		if !ok {
+			return false, fmt.Errorf("Message extension not found in %s", gqlerror)
+		}
+
+		matcher.err = gqlerror.FormattedError
 	}
 
 	switch t := matcher.expected.(type) {
@@ -73,22 +84,30 @@ func ContainMessage(expected interface{}) types.GomegaMatcher {
 }
 
 type containMessageMatcher struct {
-	err      gqlerror.Error
+	err      map[string]interface{}
 	message  string
 	expected interface{}
 }
 
-func (matcher *containMessageMatcher) Match(actual interface{}) (bool, error) {
+func (matcher *containMessageMatcher) Match(actual interface{}) (ok bool, err error) {
 	gqlerror, err := prepare("ContainMessage", actual)
 	if err != nil {
 		return false, err
 	}
 
-	matcher.err = *gqlerror
+	var message string
+	if gqlerror.Gqlerror != nil {
+		message, ok = gqlerror.Gqlerror.Extensions["message"].(string)
+		if !ok {
+			message = gqlerror.Gqlerror.Message
+		}
+	}
 
-	message, ok := gqlerror.Extensions["message"].(string)
-	if !ok {
-		message = gqlerror.Message
+	if gqlerror.FormattedError != nil {
+		message, ok = gqlerror.FormattedError.Extensions["message"].(string)
+		if !ok {
+			message = gqlerror.FormattedError.Message
+		}
 	}
 
 	switch t := matcher.expected.(type) {
@@ -102,6 +121,8 @@ func (matcher *containMessageMatcher) Match(actual interface{}) (bool, error) {
 		}
 	case string:
 		matcher.message = t
+	case error:
+		matcher.message = t.Error()
 	default:
 		return false, fmt.Errorf("ContainMessage matcher does not know how to assert %s", reflect.TypeOf(t))
 	}
